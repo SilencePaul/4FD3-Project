@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractUser
 
 def profile_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -16,7 +16,7 @@ class AssetType(models.Model):
         ('O', 'Other')
     ]
 
-class User(AbstractBaseUser):
+class User(AbstractUser):
     GENDER_CHOICE = [
         ('F', 'Female'),
         ('M', 'Male'),
@@ -26,10 +26,11 @@ class User(AbstractBaseUser):
             max_length=255,
             unique=True,
         )
+    first_name = models.CharField("first name", max_length=255, blank=True)
+    last_name = models.CharField("last name", max_length=255, blank=True)
     gender = models.CharField(choices=GENDER_CHOICE, max_length=1, default='N')
     age =  models.SmallIntegerField(default=18)
     profile = models.ImageField(upload_to=profile_path, default="")
-    USERNAME_FIELD = "email"
 
 
 class Asset(models.Model):
