@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/8ae1e5da46.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <main>
+        <section class="hero is-primary">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">
+                        Asset Management
+                    </h1>
+                    <h2 class="subtitle">
+                        A simple asset management system
+                    </h2>
+                </div>
+            </div>
+        </section>
+        <section class="section">
+            <div class="container">
+                <h2 class="title is-2">User Management</h2>
+                <p class="subtitle is-4">List of accessible users</p>
+            </div>
+            <div class="table-container">
+                <table class="table is-striped is-hoverable is-fullwidth">
+                    <thead>
+                        <tr>
+                            <td>Email</td>
+                            <td>First Name</td>
+                            <td>Last Name</td>
+                            <td>Gender</td>
+                            <td>Age</td>
+                            <td>Profile</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for x in data %}
+                            <tr>
+                                <td>{{ x.email }}</td>
+                                <td>{{ x.first_name }}</td>
+                                <td>{{ x.last_name }}</td>
+                                <td>{{ x.gender }}</td>
+                                <td>{{ x.age }}</td>
+                                <td>{{ x.profile }}</td>
+                                <td>{{ x.purchase_date }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
+            </div>
+            <div>
+                {% if hasPrev %}
+                <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
+                {% endif %}
+                {% if hasNext %}
+                <a href="?size=20&page={{ pageNext }}">Next Page</a>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+</body>
+</html>
