@@ -52,17 +52,31 @@ def vehicle(request):
                 context['data'] = Vehicle.objects.get(id=id)
             return render(request, 'vehicle/detail.html', context)
     if request.method == "POST":
-        vehicleAsset = Asset.objects.get(category='V')
         id = int(request.POST.get('id', 0))
-        brand = request.POST.get('brand', "")
-        model = request.POST.get('model', "")
-        year = request.POST.get('year', "")
-        color = request.POST.get('color', "")
-        VIN = request.POST.get('VIN', "")
-        purchase_price = request.POST.get('purchase_price', "")
-        purchase_date = request.POST.get('purchase_date', "")
-        a = Vehicle(asset_id=vehicleAsset.id, id=id, brand=brand, model=model, year=year, color=color, VIN=VIN, purchase_price=purchase_price, purchase_date=purchase_date)
-        a.save()
+        _method = request.POST.get('_method', None)
+        if _method == "delete":
+            Vehicle.objects.get(id=id).delete()
+        else:
+            vehicleAsset = Asset.objects.get(category='V')
+            brand = request.POST.get('brand', "")
+            model = request.POST.get('model', "")
+            year = request.POST.get('year', "")
+            color = request.POST.get('color', "")
+            VIN = request.POST.get('VIN', "")
+            purchase_price = request.POST.get('purchase_price', "")
+            purchase_date = request.POST.get('purchase_date', "")
+            a = Vehicle(
+                    asset_id=vehicleAsset.id,
+                    brand=brand,
+                    model=model,
+                    year=year,
+                    color=color,
+                    VIN=VIN,
+                    purchase_price=purchase_price,
+                    purchase_date=purchase_date)
+            if id > 0:
+                a.id = id
+            a.save()
         return redirect('vehicle')
 
 def user(request):
