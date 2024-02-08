@@ -45,44 +45,44 @@
             <div class="container">
                 <h2 class="title is-2">User Management</h2>
                 <p class="subtitle is-4">List of accessible users</p>
-            </div>
-            <div class="table-container">
-                <table class="table is-striped is-hoverable is-fullwidth">
-                    <thead>
-                        <tr>
-                            <td>Email</td>
-                            <td>First Name</td>
-                            <td>Last Name</td>
-                            <td>Gender</td>
-                            <td>Age</td>
-                            <td>Profile</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for x in data %}
+                <div class="table-container">
+                    <table class="table is-striped is-hoverable is-fullwidth">
+                        <thead>
                             <tr>
-                                <td>{{ x.email }}</td>
-                                <td>{{ x.first_name }}</td>
-                                <td>{{ x.last_name }}</td>
-                                <td>{{ x.gender }}</td>
-                                <td>{{ x.age }}</td>
-                                <td>{{ x.profile }}</td>
-                                <td>{{ x.purchase_date }}</td>
+                                <td>Email</td>
+                                <td>First Name</td>
+                                <td>Last Name</td>
+                                <td>Gender</td>
+                                <td>Age</td>
+                                <td>Profile</td>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
-            </div>
-            <div>
-                {% if hasPrev %}
-                <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
-                {% endif %}
-                {% if hasNext %}
-                <a href="?size=20&page={{ pageNext }}">Next Page</a>
-                {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for x in data %}
+                                <tr>
+                                    <td>{{ x.email }}</td>
+                                    <td>{{ x.first_name }}</td>
+                                    <td>{{ x.last_name }}</td>
+                                    <td>{{ x.gender }}</td>
+                                    <td>{{ x.age }}</td>
+                                    <td>{{ x.profile }}</td>
+                                    <td>{{ x.purchase_date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
+                </div>
+                <div>
+                    {% if hasPrev %}
+                    <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
+                    {% endif %}
+                    {% if hasNext %}
+                    <a href="?size=20&page={{ pageNext }}">Next Page</a>
+                    {% endif %}
+                </div>
             </div>
         </section>
     </main>

@@ -45,45 +45,51 @@
             <div class="container">
                 <h2 class="title is-2">Vehicle Management</h2>
                 <p class="subtitle is-4">List of vehicles that you own</p>
-            </div>
-            <div class="table-container">
-                <table class="table is-striped is-hoverable is-fullwidth">
-                    <thead>
-                        <tr>
-                            <td>Brand</td>
-                            <td>Model</td>
-                            <td>Year</td>
-                            <td>Color</td>
-                            <td>VIN</td>
-                            <td>Purchase Price</td>
-                            <td>Purchase Date</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for x in data %}
+                <div class="table-container">
+                    <table class="table is-striped is-hoverable is-fullwidth">
+                        <thead>
                             <tr>
-                                <td>{{ x.brand }}</td>
-                                <td>{{ x.model }}</td>
-                                <td>{{ x.year }}</td>
-                                <td>{{ x.color }}</td>
-                                <td>{{ x.VIN }}</td>
-                                <td>{{ x.purchase_price }}</td>
-                                <td>{{ x.purchase_date }}</td>
+                                <td>Brand</td>
+                                <td>Model</td>
+                                <td>Year</td>
+                                <td>Color</td>
+                                <td>VIN</td>
+                                <td>Purchase Price</td>
+                                <td>Purchase Date</td>
+                                <td>
+                                    <a href="?vt=detail">Add</a>
+                                </td>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
-            </div>
-            <div>
-                {% if hasPrev %}
-                <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
-                {% endif %}
-                {% if hasNext %}
-                <a href="?size=20&page={{ pageNext }}">Next Page</a>
-                {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for x in data %}
+                                <tr>
+                                    <td>{{ x.brand }}</td>
+                                    <td>{{ x.model }}</td>
+                                    <td>{{ x.year }}</td>
+                                    <td>{{ x.color }}</td>
+                                    <td>{{ x.VIN }}</td>
+                                    <td>{{ x.purchase_price }}</td>
+                                    <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
+                                    <td>
+                                        <a href="?vt=detail&id={{ x.id }}">Edit</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
+                </div>
+                <div>
+                    {% if hasPrev %}
+                    <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
+                    {% endif %}
+                    {% if hasNext %}
+                    <a href="?size=20&page={{ pageNext }}">Next Page</a>
+                    {% endif %}
+                </div>
             </div>
         </section>
     </main>

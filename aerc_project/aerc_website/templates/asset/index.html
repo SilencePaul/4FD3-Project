@@ -45,35 +45,35 @@
             <div class="container">
                 <h2 class="title is-2">Asset Management</h2>
                 <p class="subtitle is-4">List of current asset that you own</p>
-            </div>
-            <div class="table-container">
-                <table class="table is-striped is-hoverable is-fullwidth">
-                    <thead>
-                        <tr>
-                            <td>Asset Type</td>
-                            <td>Current Value</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for x in data %}
+                <div class="table-container">
+                    <table class="table is-striped is-hoverable is-fullwidth">
+                        <thead>
                             <tr>
-                                <td>{{ x.category }}</td>
-                                <td>{{ x.current_value }}</td>
+                                <td>Asset Type</td>
+                                <td>Current Value</td>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
-            </div>
-            <div>
-                {% if hasPrev %}
-                <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
-                {% endif %}
-                {% if hasNext %}
-                <a href="?size=20&page={{ pageNext }}">Next Page</a>
-                {% endif %}
+                        </thead>
+                        <tbody>
+                            {% for x in data %}
+                                <tr>
+                                    <td>{{ x.category }}</td>
+                                    <td>{{ x.current_value }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
+                </div>
+                <div>
+                    {% if hasPrev %}
+                    <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
+                    {% endif %}
+                    {% if hasNext %}
+                    <a href="?size=20&page={{ pageNext }}">Next Page</a>
+                    {% endif %}
+                </div>
             </div>
         </section>
     </main>
