@@ -75,3 +75,8 @@ class House(models.Model):
     parking = models.SmallIntegerField(default=0)
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    
+class HousingIndex(models.Model):
+    location = models.CharField(max_length=50, default='Canada')
+    date = models.DateTimeField(default='1980-01-01')
+    index = models.FloatField(default=0)
