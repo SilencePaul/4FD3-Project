@@ -32,7 +32,7 @@
                             <a class="navbar-item" href="/asset">
                                 Asset
                             </a>
-                            <a class="navbar-item is-active" href="/vehicle">
+                            <a class="navbar-item" href="/vehicle">
                                 Vehicle
                             </a>
                             <a class="navbar-item" href="/house">
@@ -41,7 +41,7 @@
                             <a class="navbar-item" href="/crypto">
                                 Crypto
                             </a>
-                            <a class="navbar-item" href="/stock">
+                            <a class="navbar-item is-active" href="/stock">
                                 Stock
                             </a>
                         </div>
@@ -52,17 +52,17 @@
     </section>
     <section class="section">
         <div class="container">
-            <h2 class="title is-2">Vehicle Management</h2>
-            <p class="subtitle is-4">List of vehicles that you own</p>
+            <h2 class="title is-2">Stock Management</h2>
+            <p class="subtitle is-4">List of stocks that you own</p>
             <div class="table-container">
                 <table class="table is-striped is-hoverable is-fullwidth">
                     <thead>
                     <tr>
-                        <td>Brand</td>
-                        <td>Model</td>
-                        <td>Year</td>
-                        <td>Color</td>
-                        <td>VIN</td>
+                        <td>Share</td>
+                        <td>Symbol</td>
+                        <td>Dividend</td>
+                        <td>Market</td>
+                        <td>Currency</td>
                         <td>Purchase Price</td>
                         <td>Purchase Date</td>
                         <td>
@@ -73,15 +73,15 @@
                     <tbody>
                     {% for x in data %}
                     <tr>
-                        <td>{{ x.brand }}</td>
-                        <td>{{ x.model }}</td>
-                        <td>{{ x.year }}</td>
-                        <td>{{ x.color }}</td>
-                        <td>{{ x.VIN }}</td>
+                        <td>{{ x.share }}</td>
+                        <td>{{ x.symbol }}</td>
+                        <td>{{ x.dividend }}</td>
+                        <td>{{ x.market }}</td>
+                        <td>{{ x.currency }}</td>
                         <td>{{ x.purchase_price }}</td>
                         <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                         <td>
-                            <form action="vehicle" method="post">
+                            <form action="stock" method="post">
                                 <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
                                 <input type="hidden" name="_method" value="delete" />
                                 <input name="id" type="hidden" value="{{ x.id }}"/>

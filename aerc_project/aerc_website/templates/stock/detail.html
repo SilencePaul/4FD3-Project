@@ -32,7 +32,7 @@
                             <a class="navbar-item" href="/asset">
                                 Asset
                             </a>
-                            <a class="navbar-item is-active" href="/vehicle">
+                            <a class="navbar-item" href="/vehicle">
                                 Vehicle
                             </a>
                             <a class="navbar-item" href="/house">
@@ -41,7 +41,7 @@
                             <a class="navbar-item" href="/crypto">
                                 Crypto
                             </a>
-                            <a class="navbar-item" href="/stock">
+                            <a class="navbar-item is-active" href="/stock">
                                 Stock
                             </a>
                         </div>
@@ -52,49 +52,49 @@
     </section>
     <section class="section">
         <div class="container">
-            <h2 class="title is-2">Vehicle Management</h2>
+            <h2 class="title is-2">Stock Management</h2>
             <p class="subtitle is-4">
                 {% if id > 0 %}
-                Edit your vehicle
+                Edit your stock
                 {% else %}
-                Add your new vehicle
+                Add your new stock
                 {% endif %}
             </p>
-            <form action="vehicle" method="post">
+            <form action="stock" method="post">
                 <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
                 <div class="field">
-                    <label class="label">Brand</label>
+                    <label class="label">Share</label>
                     <div class="control">
-                        <input class="input" name="brand" placeholder="Brand of your vehicle" type="text"
-                               value="{{data.brand}}">
+                        <input class="input" name="share" placeholder="Share of your stock" type="number"
+                               value="{{data.share}}">
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Model</label>
+                    <label class="label">Symbol</label>
                     <div class="control">
-                        <input class="input" name="model" placeholder="Model of your vehicle" type="text"
-                               value="{{data.model}}">
+                        <input class="input" name="symbol" placeholder="Symbol of your stock" type="text"
+                               value="{{data.symbol}}">
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Year</label>
+                    <label class="label">Dividend</label>
                     <div class="control">
-                        <input class="input" name="year" placeholder="Year that your vehicle was made" type="text"
-                               value="{{data.year}}">
+                        <input class="input" name="dividend" placeholder="Dividend of your stock" type="number"
+                               value="{{data.dividend}}">
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Color</label>
+                    <label class="label">Market</label>
                     <div class="control">
-                        <input class="input" name="color" placeholder="Color of your vehicle" type="text"
-                               value="{{data.color}}">
+                        <input class="input" name="market" placeholder="Market of your stock" type="text"
+                               value="{{data.market}}">
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">VIN</label>
+                    <label class="label">Currency</label>
                     <div class="control">
-                        <input class="input" name="VIN" placeholder="VIN of your vehicle" type="text"
-                               value="{{data.VIN}}">
+                        <input class="input" name="currency" placeholder="Currency of your stock" type="text"
+                               value="{{data.currency}}">
                     </div>
                 </div>
                 <div class="field">

@@ -32,10 +32,10 @@
                             <a class="navbar-item" href="/asset">
                                 Asset
                             </a>
-                            <a class="navbar-item is-active" href="/vehicle">
+                            <a class="navbar-item" href="/vehicle">
                                 Vehicle
                             </a>
-                            <a class="navbar-item" href="/house">
+                            <a class="navbar-item is-active" href="/house">
                                 House
                             </a>
                             <a class="navbar-item" href="/crypto">
@@ -52,17 +52,18 @@
     </section>
     <section class="section">
         <div class="container">
-            <h2 class="title is-2">Vehicle Management</h2>
-            <p class="subtitle is-4">List of vehicles that you own</p>
+            <h2 class="title is-2">House Management</h2>
+            <p class="subtitle is-4">List of houses that you own</p>
             <div class="table-container">
                 <table class="table is-striped is-hoverable is-fullwidth">
                     <thead>
                     <tr>
-                        <td>Brand</td>
-                        <td>Model</td>
-                        <td>Year</td>
-                        <td>Color</td>
-                        <td>VIN</td>
+                        <td>Property Type</td>
+                        <td>Lot Width</td>
+                        <td>Lot Depth</td>
+                        <td>Bedroom</td>
+                        <td>Bathroom</td>
+                        <td>Parking</td>
                         <td>Purchase Price</td>
                         <td>Purchase Date</td>
                         <td>
@@ -73,15 +74,16 @@
                     <tbody>
                     {% for x in data %}
                     <tr>
-                        <td>{{ x.brand }}</td>
-                        <td>{{ x.model }}</td>
-                        <td>{{ x.year }}</td>
-                        <td>{{ x.color }}</td>
-                        <td>{{ x.VIN }}</td>
+                        <td>{{ x.property_type }}</td>
+                        <td>{{ x.lot_width }}</td>
+                        <td>{{ x.lot_depth }}</td>
+                        <td>{{ x.bedroom }}</td>
+                        <td>{{ x.bathroom }}</td>
+                        <td>{{ x.parking }}</td>
                         <td>{{ x.purchase_price }}</td>
                         <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                         <td>
-                            <form action="vehicle" method="post">
+                            <form action="house" method="post">
                                 <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
                                 <input type="hidden" name="_method" value="delete" />
                                 <input name="id" type="hidden" value="{{ x.id }}"/>

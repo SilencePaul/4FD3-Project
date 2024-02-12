@@ -32,13 +32,13 @@
                             <a class="navbar-item" href="/asset">
                                 Asset
                             </a>
-                            <a class="navbar-item is-active" href="/vehicle">
+                            <a class="navbar-item" href="/vehicle">
                                 Vehicle
                             </a>
                             <a class="navbar-item" href="/house">
                                 House
                             </a>
-                            <a class="navbar-item" href="/crypto">
+                            <a class="navbar-item is-active" href="/crypto">
                                 Crypto
                             </a>
                             <a class="navbar-item" href="/stock">
@@ -52,49 +52,28 @@
     </section>
     <section class="section">
         <div class="container">
-            <h2 class="title is-2">Vehicle Management</h2>
+            <h2 class="title is-2">Crypto Management</h2>
             <p class="subtitle is-4">
                 {% if id > 0 %}
-                Edit your vehicle
+                Edit your crypto
                 {% else %}
-                Add your new vehicle
+                Add your new crypto
                 {% endif %}
             </p>
-            <form action="vehicle" method="post">
+            <form action="crypto" method="post">
                 <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
                 <div class="field">
-                    <label class="label">Brand</label>
+                    <label class="label">Coin Name</label>
                     <div class="control">
-                        <input class="input" name="brand" placeholder="Brand of your vehicle" type="text"
-                               value="{{data.brand}}">
+                        <input class="input" name="coin_name" placeholder="Coin name of your crypto" type="text"
+                               value="{{data.coin_name}}">
                     </div>
                 </div>
                 <div class="field">
-                    <label class="label">Model</label>
+                    <label class="label">Amount</label>
                     <div class="control">
-                        <input class="input" name="model" placeholder="Model of your vehicle" type="text"
-                               value="{{data.model}}">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Year</label>
-                    <div class="control">
-                        <input class="input" name="year" placeholder="Year that your vehicle was made" type="text"
-                               value="{{data.year}}">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Color</label>
-                    <div class="control">
-                        <input class="input" name="color" placeholder="Color of your vehicle" type="text"
-                               value="{{data.color}}">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">VIN</label>
-                    <div class="control">
-                        <input class="input" name="VIN" placeholder="VIN of your vehicle" type="text"
-                               value="{{data.VIN}}">
+                        <input class="input" name="amount" placeholder="Amount of your crypto" type="number"
+                               value="{{data.amount}}">
                     </div>
                 </div>
                 <div class="field">
