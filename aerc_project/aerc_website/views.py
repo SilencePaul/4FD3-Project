@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+import requests
 from .models import Vehicle, House, Crypto, Stock, User, Asset, AssetType
 from enum import Enum, auto
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -233,6 +234,40 @@ def stock(request):
                 a.id = id
             a.save()
         return redirect('stock')
+
+def stock_search(request, stock_ticker):
+    context = {}
+    if request.method == "GET":
+        stock_ticker = stock_ticker.upper()
+        params = {
+            "apiKey": "wW55pKJzExsThjPDizKdf8OAdDfkvLPW",
+            "market": "stocks",
+            "ticker": stock_ticker,
+            "limit": 10
+        }
+        response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
+        response_json = response.json()
+        
+        response_json_results = response_json["results"]
+        result_count = len(response_json_results)
+        result_list = []
+        if result_count == 1:
+            result_list.append(response_json_results[0])
+        elif result_count == 0:
+            params = {
+                "apiKey": "wW55pKJzExsThjPDizKdf8OAdDfkvLPW",
+                "market": "stocks",
+                "search": stock_ticker,
+                "limit": 10
+            }
+            response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
+            response_json = response.json()
+            response_json_results = response_json["results"]
+            for result in response_json_results:
+                result_list.append(result)
+        context["result_count"] = result_count
+        context["result_list"] = result_list
+        return render(request, '_stock_verify.html', context)
 
 def user(request):
     context = {}

@@ -1,0 +1,42 @@
+{% if result_count == 1 %}
+    <p>Stock Ticker Verification Pass</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Company Name</th>
+                <th>Market</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in result_list %}
+            <tr>
+                <td>{{ result.ticker }}</td>
+                <td>{{ result.name }}</td>
+                <td>{{ result.market }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>Stock Ticker Verification Fail.</p>
+    <p>Here are some possible ticker and company name matched.</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Ticker</th>
+            <th>Company Name</th>
+            <th>Market</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in result_list %}
+        <tr>
+            <td>{{ result.ticker }}</td>
+            <td>{{ result.name }}</td>
+            <td>{{ result.market }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}

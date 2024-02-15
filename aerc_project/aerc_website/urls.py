@@ -26,4 +26,5 @@ urlpatterns = [
     path('stock', views.stock, name='stock'),
     path('user', views.user, name='user'),
     path('asset', views.asset, name='asset'),
+    path('stock_search/<str:stock_ticker>/', views.stock_search, name='stock-search'),
 ]

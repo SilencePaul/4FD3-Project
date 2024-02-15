@@ -7,6 +7,7 @@
     <title>Asset Management</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <script src="https://kit.fontawesome.com/8ae1e5da46.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
@@ -61,8 +62,10 @@
                     <div class="field">
                         <label class="label">Stock info:</label>
                         <div class="control">
-                            <input class="input" type="text" name="stock" placeholder="Please enter your stock information">
+                            <input class="input" type="text" id="stock_ticker" placeholder="Please enter your stock ticker symbol">
                         </div>
+                        <button class="button is-primary" id="stock_verify"type="button">Verify</button>
+                        <div id="stock_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
                     </div>
                     <div class="field">
                         <label class="label">Crypto info:</label>
@@ -153,8 +156,8 @@
                             </div>
                         </div>
                     </div>
-
         </section>
     </main>
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
