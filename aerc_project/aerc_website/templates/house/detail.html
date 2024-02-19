@@ -1,134 +1,82 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Asset Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
-    <script crossorigin="anonymous" src="https://kit.fontawesome.com/8ae1e5da46.js"></script>
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-</head>
-<body>
-<main>
-    <section class="hero is-primary">
-        <div class="hero-body">
-            <div class="container">
-                <h1 class="title">
-                    Asset Management
-                </h1>
-                <h2 class="subtitle">
-                    A simple asset management system
-                </h2>
-                <nav aria-label="main navigation" class="navbar" role="navigation">
-                    <div class="navbar-menu" id="navbarBasicExample">
-                        <div class="navbar-start">
-                            <a class="navbar-item" href="/">
-                                Home
-                            </a>
-                            <a class="navbar-item" href="/user">
-                                User
-                            </a>
-                            <a class="navbar-item" href="/asset">
-                                Asset
-                            </a>
-                            <a class="navbar-item" href="/vehicle">
-                                Vehicle
-                            </a>
-                            <a class="navbar-item is-active" href="/house">
-                                House
-                            </a>
-                            <a class="navbar-item" href="/crypto">
-                                Crypto
-                            </a>
-                            <a class="navbar-item" href="/stock">
-                                Stock
-                            </a>
-                        </div>
-                    </div>
-                </nav>
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">House Management</h2>
+        <p class="subtitle is-4">
+            {% if id > 0 %}
+            Edit your house
+            {% else %}
+            Add your new house
+            {% endif %}
+        </p>
+        <form action="house" method="post">
+            <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
+            <div class="field">
+                <label class="label">Property Type</label>
+                <div class="control">
+                    <input class="input" name="property_type" placeholder="Property type of your house" type="text"
+                            value="{{data.property_type}}">
+                </div>
             </div>
-        </div>
-    </section>
-    <section class="section">
-        <div class="container">
-            <h2 class="title is-2">House Management</h2>
-            <p class="subtitle is-4">
-                {% if id > 0 %}
-                Edit your house
-                {% else %}
-                Add your new house
-                {% endif %}
-            </p>
-            <form action="house" method="post">
-                <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
-                <div class="field">
-                    <label class="label">Property Type</label>
-                    <div class="control">
-                        <input class="input" name="property_type" placeholder="Property type of your house" type="text"
-                               value="{{data.property_type}}">
-                    </div>
+            <div class="field">
+                <label class="label">Lot Width</label>
+                <div class="control">
+                    <input class="input" name="lot_width" placeholder="Lot width of your house" type="number"
+                            value="{{data.lot_width}}">
                 </div>
-                <div class="field">
-                    <label class="label">Lot Width</label>
-                    <div class="control">
-                        <input class="input" name="lot_width" placeholder="Lot width of your house" type="number"
-                               value="{{data.lot_width}}">
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">Lot Depth</label>
+                <div class="control">
+                    <input class="input" name="lot_depth" placeholder="Lot depth of your house" type="number"
+                            value="{{data.lot_depth}}">
                 </div>
-                <div class="field">
-                    <label class="label">Lot Depth</label>
-                    <div class="control">
-                        <input class="input" name="lot_depth" placeholder="Lot depth of your house" type="number"
-                               value="{{data.lot_depth}}">
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">Bedroom</label>
+                <div class="control">
+                    <input class="input" name="bedroom" placeholder="Number of bedrooms in your house" type="number"
+                            value="{{data.bedroom}}">
                 </div>
-                <div class="field">
-                    <label class="label">Bedroom</label>
-                    <div class="control">
-                        <input class="input" name="bedroom" placeholder="Number of bedrooms in your house" type="number"
-                               value="{{data.bedroom}}">
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">Bathroom</label>
+                <div class="control">
+                    <input class="input" name="bathroom" placeholder="Number of bathrooms in your house" type="number"
+                            value="{{data.bathroom}}">
                 </div>
-                <div class="field">
-                    <label class="label">Bathroom</label>
-                    <div class="control">
-                        <input class="input" name="bathroom" placeholder="Number of bathrooms in your house" type="number"
-                               value="{{data.bathroom}}">
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">Parking</label>
+                <div class="control">
+                    <input class="input" name="parking" placeholder="Parking of your house" type="number"
+                            value="{{data.parking}}">
                 </div>
-                <div class="field">
-                    <label class="label">Parking</label>
-                    <div class="control">
-                        <input class="input" name="parking" placeholder="Parking of your house" type="number"
-                               value="{{data.parking}}">
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">Purchase Price</label>
+                <div class="control">
+                    <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
+                            value="{{data.purchase_price}}">
                 </div>
-                <div class="field">
-                    <label class="label">Purchase Price</label>
-                    <div class="control">
-                        <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
-                               value="{{data.purchase_price}}">
-                    </div>
+            </div>
+            <div class="field">
+                <label class="label">Purchase Date</label>
+                <div class="control">
+                    <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
+                            value="{{data.purchase_date|date:'Y-m-d'}}">
                 </div>
-                <div class="field">
-                    <label class="label">Purchase Date</label>
-                    <div class="control">
-                        <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
-                               value="{{data.purchase_date|date:'Y-m-d'}}">
-                    </div>
+            </div>
+            <div class="field is-grouped">
+                <div class="control">
+                    <input class="button is-link" type="submit" value="Save"/>
                 </div>
-                <div class="field is-grouped">
-                    <div class="control">
-                        <input class="button is-link" type="submit" value="Save"/>
-                    </div>
-                    <div class="control">
-                        <a class="button is-link is-light" href="?vt=list">Cancel</a>
-                    </div>
+                <div class="control">
+                    <a class="button is-link is-light" href="?vt=list">Cancel</a>
                 </div>
-            </form>
-        </div>
-    </section>
-</main>
-</body>
-</html>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

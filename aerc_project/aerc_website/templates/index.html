@@ -1,163 +1,111 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asset Management</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <script src="https://kit.fontawesome.com/8ae1e5da46.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <main>
-        <section class="hero is-primary">
-            <div class="hero-body">
-                <div class="container">
-                    <h1 class="title">
-                        Asset Management
-                    </h1>
-                    <h2 class="subtitle">
-                        A simple asset management system
-                    </h2>
-                    <nav class="navbar" role="navigation" aria-label="main navigation">
-                        <div id="navbarBasicExample" class="navbar-menu">
-                            <div class="navbar-start">
-                                <a class="navbar-item is-active" href="/">
-                                    Home
-                                </a>
-                                <a class="navbar-item" href="/user">
-                                    User
-                                </a>
-                                <a class="navbar-item" href="/asset">
-                                    Asset
-                                </a>
-                                <a class="navbar-item" href="/vehicle">
-                                    Vehicle
-                                </a>
-                                <a class="navbar-item" href="/house">
-                                    House
-                                </a>
-                                <a class="navbar-item" href="/crypto">
-                                    Crypto
-                                </a>
-                                <a class="navbar-item" href="/stock">
-                                    Stock
-                                </a>
-                            </div>
-                        </div>
-                    </nav>
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Welcome to the Asset Management System</h2>
+        <p class="subtitle is-4">Please enter your asset information below</p>
+    </div>
+    <div>
+        <form action="" method="POST" name="asset-infor-form">
+            {% csrf_token %}
+            <div class="field">
+                <label class="label">Stock info:</label>
+                <div class="control">
+                    <input class="input" type="text" id="stock_ticker" placeholder="Please enter your stock ticker symbol">
+                </div>
+                <button class="button is-primary" id="stock_verify"type="button">Verify</button>
+                <div id="stock_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
+            </div>
+            <div class="field">
+                <label class="label">Crypto info:</label>
+                <div class="control">
+                    <input class="input" type="text" name="crypto" placeholder="Please enter your crypto information">
                 </div>
             </div>
-        </section>
-        <section class="section">
-            <div class="container">
-                <h2 class="title is-2">Welcome to the Asset Management System</h2>
-                <p class="subtitle is-4">Please enter your asset information below</p>
+            <div class="field">
+                <label class="label">House info:</label>
+                <div class="control">
+                    <input class="input" type="text" name="house" placeholder="Please enter your house information">
+                </div>
             </div>
-            <div>
-                <form action="" method="POST" name="asset-infor-form">
-                    {% csrf_token %}
-                    <div class="field">
-                        <label class="label">Stock info:</label>
-                        <div class="control">
-                            <input class="input" type="text" id="stock_ticker" placeholder="Please enter your stock ticker symbol">
-                        </div>
-                        <button class="button is-primary" id="stock_verify"type="button">Verify</button>
-                        <div id="stock_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Crypto info:</label>
-                        <div class="control">
-                            <input class="input" type="text" name="crypto" placeholder="Please enter your crypto information">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">House info:</label>
-                        <div class="control">
-                            <input class="input" type="text" name="house" placeholder="Please enter your house information">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Vehicle info:</label>
-                        <div class="control">
-                            <input class="input" type="text" name="vehicle" placeholder="Please enter your vehicle information">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-link" type="submit">Submit</button>
-                        </div>
-                    </div>
-                </form>
+            <div class="field">
+                <label class="label">Vehicle info:</label>
+                <div class="control">
+                    <input class="input" type="text" name="vehicle" placeholder="Please enter your vehicle information">
+                </div>
             </div>
-        </section>
-        <section class="section">
-            <div class="container">
-                <h2 class="title is-2">Your Asset Information</h2>
-                <p class="subtitle is-4">Your asset information will be displayed here</p>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-link" type="submit">Submit</button>
+                </div>
             </div>
-            <div class="container">
-                <div class="columns">
-                    <div class="column">
-                        <div class="card">
-                            <div class="card-content">
-                                <p class="title">Stock</p>
-                                <p class="subtitle">
-                                    {% if stock %}
-                                        {{ stock }}
-                                    {% else %}
-                                        No stock information
-                                    {% endif %}
-                                </p>    
-                            </div>
-                        </div>
+        </form>
+    </div>
+</section>
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Your Asset Information</h2>
+        <p class="subtitle is-4">Your asset information will be displayed here</p>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">Stock</p>
+                        <p class="subtitle">
+                            {% if stock %}
+                                {{ stock }}
+                            {% else %}
+                                No stock information
+                            {% endif %}
+                        </p>    
                     </div>
-                    <div class="column">
-                        <div class="card">
-                            <div class="card-content">
-                                <p class="title">Crypto</p>
-                                <p class="subtitle">
-                                    {% if crypto %}
-                                        {{ crypto }}
-                                    {% else %}
-                                        No crypto information
-                                    {% endif %}
-                                </p>    
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">Crypto</p>
+                        <p class="subtitle">
+                            {% if crypto %}
+                                {{ crypto }}
+                            {% else %}
+                                No crypto information
+                            {% endif %}
+                        </p>    
                     </div>
-                    <div class="column">
-                        <div class="card">
-                            <div class="card-content">
-                                <p class="title">House</p>
-                                <p class="subtitle">
-                                    {% if house %}
-                                        {{ house }}
-                                    {% else %}
-                                        No house information
-                                    {% endif %}
-                                </p>    
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">House</p>
+                        <p class="subtitle">
+                            {% if house %}
+                                {{ house }}
+                            {% else %}
+                                No house information
+                            {% endif %}
+                        </p>    
                     </div>
-                    <div class="column">
-                        <div class="card">
-                            <div class="card-content">
-                                <p class="title">Vehicle</p>
-                                <p class="subtitle">
-                                    {% if vehicle %}
-                                        {{ vehicle }}
-                                    {% else %}
-                                        No vehicle information
-                                    {% endif %}
-                                </p>    
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">Vehicle</p>
+                        <p class="subtitle">
+                            {% if vehicle %}
+                                {{ vehicle }}
+                            {% else %}
+                                No vehicle information
+                            {% endif %}
+                        </p>    
                     </div>
-        </section>
-    </main>
-    <script src="{% static 'js/main.js' %}"></script>
-</body>
-</html>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

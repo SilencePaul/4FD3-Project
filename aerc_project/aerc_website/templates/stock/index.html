@@ -1,111 +1,59 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Asset Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" rel="stylesheet">
-    <script crossorigin="anonymous" src="https://kit.fontawesome.com/8ae1e5da46.js"></script>
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-</head>
-<body>
-<main>
-    <section class="hero is-primary">
-        <div class="hero-body">
-            <div class="container">
-                <h1 class="title">
-                    Asset Management
-                </h1>
-                <h2 class="subtitle">
-                    A simple asset management system
-                </h2>
-                <nav aria-label="main navigation" class="navbar" role="navigation">
-                    <div class="navbar-menu" id="navbarBasicExample">
-                        <div class="navbar-start">
-                            <a class="navbar-item" href="/">
-                                Home
-                            </a>
-                            <a class="navbar-item" href="/user">
-                                User
-                            </a>
-                            <a class="navbar-item" href="/asset">
-                                Asset
-                            </a>
-                            <a class="navbar-item" href="/vehicle">
-                                Vehicle
-                            </a>
-                            <a class="navbar-item" href="/house">
-                                House
-                            </a>
-                            <a class="navbar-item" href="/crypto">
-                                Crypto
-                            </a>
-                            <a class="navbar-item is-active" href="/stock">
-                                Stock
-                            </a>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Stock Management</h2>
+        <p class="subtitle is-4">List of stocks that you own</p>
+        <div class="table-container">
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                <tr>
+                    <td>Share</td>
+                    <td>Symbol</td>
+                    <td>Dividend</td>
+                    <td>Market</td>
+                    <td>Currency</td>
+                    <td>Purchase Price</td>
+                    <td>Purchase Date</td>
+                    <td>
+                        <a class="button is-primary is-small" href="?vt=detail">Add</a>
+                    </td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for x in data %}
+                <tr>
+                    <td>{{ x.share }}</td>
+                    <td>{{ x.symbol }}</td>
+                    <td>{{ x.dividend }}</td>
+                    <td>{{ x.market }}</td>
+                    <td>{{ x.currency }}</td>
+                    <td>{{ x.purchase_price }}</td>
+                    <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
+                    <td>
+                        <form action="stock" method="post">
+                            <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
+                            <input type="hidden" name="_method" value="delete" />
+                            <input name="id" type="hidden" value="{{ x.id }}"/>
+                            <input type="submit" value="Delete" class="button is-danger is-small" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </section>
-    <section class="section">
-        <div class="container">
-            <h2 class="title is-2">Stock Management</h2>
-            <p class="subtitle is-4">List of stocks that you own</p>
-            <div class="table-container">
-                <table class="table is-striped is-hoverable is-fullwidth">
-                    <thead>
-                    <tr>
-                        <td>Share</td>
-                        <td>Symbol</td>
-                        <td>Dividend</td>
-                        <td>Market</td>
-                        <td>Currency</td>
-                        <td>Purchase Price</td>
-                        <td>Purchase Date</td>
-                        <td>
-                            <a class="button is-primary is-small" href="?vt=detail">Add</a>
-                        </td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for x in data %}
-                    <tr>
-                        <td>{{ x.share }}</td>
-                        <td>{{ x.symbol }}</td>
-                        <td>{{ x.dividend }}</td>
-                        <td>{{ x.market }}</td>
-                        <td>{{ x.currency }}</td>
-                        <td>{{ x.purchase_price }}</td>
-                        <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
-                        <td>
-                            <form action="stock" method="post">
-                                <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
-                                <input type="hidden" name="_method" value="delete" />
-                                <input name="id" type="hidden" value="{{ x.id }}"/>
-                                <input type="submit" value="Delete" class="button is-danger is-small" />
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div>
-                Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
-            </div>
-            <div>
-                {% if hasPrev %}
-                <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
-                {% endif %}
-                {% if hasNext %}
-                <a href="?size=20&page={{ pageNext }}">Next Page</a>
-                {% endif %}
-            </div>
+        <div>
+            Total: {{ total }}, Page Number: {{ page }}, Page Size: {{ size }}
         </div>
-    </section>
-</main>
-</body>
-</html>
+        <div>
+            {% if hasPrev %}
+            <a href="?size=20&page={{ pagePrev }}">Prev Page</a>
+            {% endif %}
+            {% if hasNext %}
+            <a href="?size=20&page={{ pageNext }}">Next Page</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/8ae1e5da46.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="shortcut icon" href="{% static 'favicon/favicon.ico' %}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <section class="hero is-primary">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">
+                        Asset Management
+                    </h1>
+                    <h2 class="subtitle">
+                        A simple asset management system
+                    </h2>
+                    <nav class="navbar" role="navigation" aria-label="main navigation">
+                        <div class="navbar-brand">
+                            <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
+                                <span aria-hidden="true"></span>
+                                <span aria-hidden="true"></span>
+                                <span aria-hidden="true"></span>
+                            </a>
+                        </div>
+                        <div class="navbar-menu" id="navMenu">
+                            <div class="navbar-start">
+                                <a class="navbar-item is-active" href="/">
+                                    Home
+                                </a>
+                                <a class="navbar-item" href="/user">
+                                    User
+                                </a>
+                                <a class="navbar-item" href="/asset">
+                                    Asset
+                                </a>
+                                <a class="navbar-item" href="/vehicle">
+                                    Vehicle
+                                </a>
+                                <a class="navbar-item" href="/house">
+                                    House
+                                </a>
+                                <a class="navbar-item" href="/crypto">
+                                    Crypto
+                                </a>
+                                <a class="navbar-item" href="/stock">
+                                    Stock
+                                </a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </section>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/nav_bar_toggle.js' %}"></script>
+</body>
+</html>
