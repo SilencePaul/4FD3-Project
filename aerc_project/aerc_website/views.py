@@ -55,10 +55,10 @@ def vehicle(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='V')
         if _method == "delete":
             Vehicle.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='V')
             brand = request.POST.get('brand', "")
             model = request.POST.get('model', "")
             year = request.POST.get('year', "")
@@ -78,6 +78,10 @@ def vehicle(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = Vehicle.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('vehicle')
 
 @csrf_exempt
@@ -108,10 +112,10 @@ def house(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='R')
         if _method == "delete":
             House.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='R')
             property_type = request.POST.get('property_type', "")
             lot_width = float(request.POST.get('lot_width', 0))
             lot_depth = float(request.POST.get('lot_depth', 0))
@@ -133,6 +137,10 @@ def house(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = House.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('house')
 
 @csrf_exempt
@@ -163,10 +171,10 @@ def crypto(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='C')
         if _method == "delete":
             Crypto.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='C')
             coin_name = request.POST.get('coin_name', "")
             amount = int(request.POST.get('amount', 0))
             purchase_price = request.POST.get('purchase_price', "")
@@ -180,6 +188,10 @@ def crypto(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = Crypto.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('crypto')
 
 @csrf_exempt
@@ -210,10 +222,10 @@ def stock(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='E')
         if _method == "delete":
             Stock.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='E')
             share = int(request.POST.get('share', 0))
             symbol = request.POST.get('symbol', "")
             dividend = float(request.POST.get('dividend', 0))
@@ -233,6 +245,10 @@ def stock(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = Stock.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('stock')
 
 def stock_search(request, stock_ticker):
