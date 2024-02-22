@@ -8,7 +8,6 @@ from django.core.cache import cache
 from datetime import timedelta
 
 IS_LOGGED = "isLogged"
-PASSWORD = "4fd3"
 
 class VIEWTYPE(Enum):
     list = auto()
@@ -19,7 +18,7 @@ class VIEWTYPE(Enum):
 def login(request):
     context = {}
     if request.method == "POST":
-        if PASSWORD == request.POST.get('password', None):
+        if User.objects.get(username="admin").check_password(request.POST.get('password', None)):
             cache.set(IS_LOGGED, True, 86400)
             return redirect('index')
         else:
