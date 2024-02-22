@@ -11,6 +11,7 @@
                 {% endif %}
             </p>
             <form action="vehicle" method="post">
+                {% csrf_token %}
                 <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
                 <div class="field">
                     <label class="label">Brand</label>

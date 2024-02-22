@@ -4,6 +4,11 @@ import requests
 from .models import Vehicle, House, Crypto, Stock, User, Asset, AssetType
 from enum import Enum, auto
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.core.cache import cache
+from datetime import timedelta
+
+IS_LOGGED = "isLogged"
+PASSWORD = "4fd3"
 
 class VIEWTYPE(Enum):
     list = auto()
@@ -11,7 +16,26 @@ class VIEWTYPE(Enum):
 
 # Create your views here.
 
+def login(request):
+    context = {}
+    if request.method == "POST":
+        if PASSWORD == request.POST.get('password', None):
+            cache.set(IS_LOGGED, True, 86400)
+            return redirect('index')
+        else:
+            context['msg'] = "Password is wrong!"
+            return render(request, 'login.html', context)
+    else:
+        return render(request, 'login.html')
+
+def logout(request):
+    if cache.get(IS_LOGGED, False):
+        cache.delete(IS_LOGGED)
+    return redirect('login')
+
 def index(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "POST":
         stock = request.POST.get('stock', None)
@@ -27,8 +51,9 @@ def index(request):
     else:
         return render(request, 'index.html')
 
-@csrf_exempt
 def vehicle(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -84,8 +109,9 @@ def vehicle(request):
         asset.save()
         return redirect('vehicle')
 
-@csrf_exempt
 def house(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -143,8 +169,9 @@ def house(request):
         asset.save()
         return redirect('house')
 
-@csrf_exempt
 def crypto(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -194,8 +221,9 @@ def crypto(request):
         asset.save()
         return redirect('crypto')
 
-@csrf_exempt
 def stock(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -286,6 +314,8 @@ def stock_search(request, stock_ticker):
         return render(request, '_stock_verify.html', context)
 
 def user(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         total = User.objects.count()
@@ -303,6 +333,8 @@ def user(request):
         return render(request, 'user/index.html', context)
 
 def asset(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         total = Asset.objects.count()

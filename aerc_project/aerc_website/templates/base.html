@@ -54,6 +54,17 @@
                                     Stock
                                 </a>
                             </div>
+                            <div class="navbar-end">
+                                {% if request.path != '/login' %}
+                                    <div class="navbar-item">
+                                        <div class="buttons">
+                                          <a class="button is-danger is-outlined" href="/logout">
+                                            Log Out
+                                          </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
                     </nav>
                 </div>
