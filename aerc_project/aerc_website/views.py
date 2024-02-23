@@ -36,6 +36,12 @@ def logout(request):
         cache.delete(IS_LOGGED)
     return redirect('login')
 
+def home(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
+    context = {}
+    return render(request, 'index.html', context)
+
 def index(request):
     if cache.get(IS_LOGGED, False) is not True:
         return redirect('login')

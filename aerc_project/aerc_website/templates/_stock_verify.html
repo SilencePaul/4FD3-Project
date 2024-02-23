@@ -45,7 +45,7 @@
             <td>{{ result.name }}</td>
             <td>{{ result.market }}</td>
             <td>
-                <a href="{% url 'stock' %}?vt=detail&ticker={{ result.ticker }}">
+                <a href="{% url 'stock' %}?vt=edit&ticker={{ result.ticker }}">
                     <button class="button is-success">
                         <i class="fa fa-plus"></i>ADD
                     </button>

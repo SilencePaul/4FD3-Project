@@ -30,6 +30,7 @@
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                     <td>
                         <form action="stock" method="post">
+                            {% csrf_token %}
                             <a class="button is-info is-small" href="?vt=edit&id={{ x.id }}">Edit</a>
                             <a class="button is-link is-small" href="?vt=detail&id={{ x.id }}">Detail</a>
                             <input type="hidden" name="_method" value="delete" />
