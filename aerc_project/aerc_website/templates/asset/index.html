@@ -13,10 +13,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for x in data %}
+                    {% for info in data %}
                         <tr>
-                            <td>{{ x.category }}</td>
-                            <td>{{ x.current_value }}</td>
+                            <td>{{ info.category }}</td>
+                            <td>{{ info.current_value }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -6,6 +6,7 @@
                 <th>Ticker</th>
                 <th>Company Name</th>
                 <th>Market</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -14,19 +15,27 @@
                 <td>{{ result.ticker }}</td>
                 <td>{{ result.name }}</td>
                 <td>{{ result.market }}</td>
+                <td>
+                    <a href="{% url 'stock' %}?vt=edit&ticker={{ result.ticker }}">
+                        <button class="button is-success">
+                            <i class="fa fa-plus"></i>ADD
+                        </button>
+                    </a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 {% else %}
     <p class="has-text-danger">Stock Ticker Verification Fail.</p>
-    <p>Here are some possible ticker and company name matched.</p>
+    <p class="has-text-danger">Here are some possible ticker and company name matched.</p>
 <table class="table">
     <thead>
         <tr>
             <th>Ticker</th>
             <th>Company Name</th>
             <th>Market</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -35,6 +44,13 @@
             <td>{{ result.ticker }}</td>
             <td>{{ result.name }}</td>
             <td>{{ result.market }}</td>
+            <td>
+                <a href="{% url 'stock' %}?vt=detail&ticker={{ result.ticker }}">
+                    <button class="button is-success">
+                        <i class="fa fa-plus"></i>ADD
+                    </button>
+                </a>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

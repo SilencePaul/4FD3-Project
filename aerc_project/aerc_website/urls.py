@@ -20,11 +20,12 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('home', views.home, name='home'),
     path('vehicle', views.vehicle, name='vehicle'),
     path('house', views.house, name='house'),
     path('crypto', views.crypto, name='crypto'),
     path('stock', views.stock, name='stock'),
     path('user', views.user, name='user'),
     path('asset', views.asset, name='asset'),
-    path('stock_search/<str:stock_ticker>/', views.stock_search, name='stock-search'),
+    re_path(r'^stock_search/(?P<stock_ticker>[^/]+)/$', views.stock_search, name='stock-search'),
 ]

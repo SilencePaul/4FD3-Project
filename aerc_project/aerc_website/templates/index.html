@@ -5,41 +5,37 @@
         <h2 class="title is-2">Welcome to the Asset Management System</h2>
         <p class="subtitle is-4">Please enter your asset information below</p>
     </div>
-    <div>
-        <form action="" method="POST" name="asset-infor-form">
-            {% csrf_token %}
-            <div class="field">
+    <div class="container">
+        <div class="columns">
+            <div class="column is-half">
                 <label class="label">Stock info:</label>
                 <div class="control">
-                    <input class="input" type="text" id="stock_ticker" placeholder="Please enter your stock ticker symbol">
-                </div>
-                <button class="button is-primary" id="stock_verify"type="button">Verify</button>
+                    <input class="input" type="text" id="stock_ticker" placeholder="Please enter your stock ticker symbol"></br>
+                    <button class="button is-primary mt-1" id="stock_verify"type="button">Verify</button>
+                </div> 
                 <div id="stock_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
             </div>
-            <div class="field">
+            <div class="column is-half">
                 <label class="label">Crypto info:</label>
                 <div class="control">
                     <input class="input" type="text" name="crypto" placeholder="Please enter your crypto information">
                 </div>
             </div>
-            <div class="field">
+        </div>
+        <div class="columns">
+            <div class="column is-half">
                 <label class="label">House info:</label>
                 <div class="control">
                     <input class="input" type="text" name="house" placeholder="Please enter your house information">
                 </div>
             </div>
-            <div class="field">
+            <div class="column is-half">
                 <label class="label">Vehicle info:</label>
                 <div class="control">
                     <input class="input" type="text" name="vehicle" placeholder="Please enter your vehicle information">
                 </div>
             </div>
-            <div class="field">
-                <div class="control">
-                    <button class="button is-link" type="submit">Submit</button>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
 </section>
 <section class="section">

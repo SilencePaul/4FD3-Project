@@ -9,14 +9,13 @@
                 <thead>
                 <tr>
                     <td>Share</td>
-                    <td>Symbol</td>
-                    <td>Dividend</td>
+                    <td>Ticker Symbol</td>
                     <td>Market</td>
                     <td>Currency</td>
                     <td>Purchase Price</td>
                     <td>Purchase Date</td>
                     <td>
-                        <a class="button is-primary is-small" href="?vt=detail">Add</a>
+                        <a class="button is-primary is-small" href="?vt=edit">Add</a>
                     </td>
                 </tr>
                 </thead>
@@ -24,15 +23,15 @@
                 {% for x in data %}
                 <tr>
                     <td>{{ x.share }}</td>
-                    <td>{{ x.symbol }}</td>
-                    <td>{{ x.dividend }}</td>
+                    <td>{{ x.ticker_symbol }}</td>
                     <td>{{ x.market }}</td>
                     <td>{{ x.currency }}</td>
                     <td>{{ x.purchase_price }}</td>
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                     <td>
                         <form action="stock" method="post">
-                            <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
+                            <a class="button is-info is-small" href="?vt=edit&id={{ x.id }}">Edit</a>
+                            <a class="button is-link is-small" href="?vt=detail&id={{ x.id }}">Detail</a>
                             <input type="hidden" name="_method" value="delete" />
                             <input name="id" type="hidden" value="{{ x.id }}"/>
                             <input type="submit" value="Delete" class="button is-danger is-small" />

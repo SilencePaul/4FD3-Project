@@ -1,17 +1,23 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 import requests
-from .models import Vehicle, House, Crypto, Stock, User, Asset, AssetType
+from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType
 from enum import Enum, auto
+import matplotlib.pyplot as plt
+from datetime import datetime
+import io
+import urllib, base64
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
 class VIEWTYPE(Enum):
     list = auto()
     detail = auto()
+    edit = auto()
 
 # Create your views here.
-
 def index(request):
+    return redirect('home')
+
+def home(request):
     context = {}
     if request.method == "POST":
         stock = request.POST.get('stock', None)
@@ -185,6 +191,21 @@ def crypto(request):
 @csrf_exempt
 def stock(request):
     context = {}
+    ticker = request.GET.get('ticker', None)
+    apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
+    if ticker:
+        params = {
+            "apiKey": apikey,
+            "ticker": ticker,
+        }
+        response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
+        response_json = response.json()
+        results = response_json["results"][0]
+
+        context['ticker'] = results["ticker"]
+        context['name'] = results["name"]
+        context['market'] = results["market"].upper()
+        context['currency'] = results["currency_name"].upper()
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
@@ -201,12 +222,37 @@ def stock(request):
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'stock/index.html', context)
-        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+        elif VIEWTYPE[viewtype] is VIEWTYPE.edit:
             id = int(request.GET.get('id', 0))
             context['id'] = id
             if id > 0:
                 context['data'] = Stock.objects.get(id=id)
-            return render(request, 'stock/detail.html', context)
+            return render(request, 'stock/add.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                stock_data = Stock.objects.get(id=id)
+                context['data'] = stock_data
+                base_url = 'https://api.polygon.io/v2/aggs/ticker/'
+                ticker = stock_data.ticker_symbol
+                date_from = stock_data.purchase_date
+                date_to = datetime.now().date()
+                purchase_price = stock_data.purchase_price
+
+                # Get the stock data
+                url = f"{base_url}{ticker}/range/1/day/{date_from}/{date_to}"
+                params = {
+                    'apiKey': apikey,
+                }
+                response = requests.get(url, params=params)
+                data = response.json()
+                
+                # Generate the Plot for html
+                dates = [datetime.utcfromtimestamp(item['t'] / 1000).date() for item in data['results']]
+                closing_prices = [item['c'] for item in data['results']]
+                
+                return render(request, 'stock/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
@@ -215,8 +261,7 @@ def stock(request):
         else:
             asset = Asset.objects.get(category='E')
             share = int(request.POST.get('share', 0))
-            symbol = request.POST.get('symbol', "")
-            dividend = float(request.POST.get('dividend', 0))
+            ticker_symbol = request.POST.get('ticker_symbol', "")
             market = request.POST.get('market', "")
             currency = request.POST.get('currency', "")
             purchase_price = request.POST.get('purchase_price', "")
@@ -224,8 +269,7 @@ def stock(request):
             a = Stock(
                 asset_id=asset.id,
                 share=share,
-                symbol=symbol,
-                dividend=dividend,
+                ticker_symbol=ticker_symbol,
                 market=market,
                 currency=currency,
                 purchase_price=purchase_price,
