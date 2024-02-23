@@ -5,6 +5,8 @@
 ## Setup
 
 `pip install -r requirements.txt`
+or
+`python3.11 -m pip install -r requirements.txt`
 
 ## Run Server
 

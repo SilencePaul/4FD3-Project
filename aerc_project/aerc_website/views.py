@@ -7,6 +7,10 @@ from datetime import datetime
 import io
 import urllib, base64
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.core.cache import cache
+from datetime import timedelta
+
+IS_LOGGED = "isLogged"
 
 class VIEWTYPE(Enum):
     list = auto()
@@ -14,10 +18,27 @@ class VIEWTYPE(Enum):
     edit = auto()
 
 # Create your views here.
-def index(request):
-    return redirect('home')
 
-def home(request):
+def login(request):
+    context = {}
+    if request.method == "POST":
+        if User.objects.get(username="admin").check_password(request.POST.get('password', None)):
+            cache.set(IS_LOGGED, True, 86400)
+            return redirect('index')
+        else:
+            context['msg'] = "Password is wrong!"
+            return render(request, 'login.html', context)
+    else:
+        return render(request, 'login.html')
+
+def logout(request):
+    if cache.get(IS_LOGGED, False):
+        cache.delete(IS_LOGGED)
+    return redirect('login')
+
+def index(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "POST":
         stock = request.POST.get('stock', None)
@@ -33,8 +54,9 @@ def home(request):
     else:
         return render(request, 'index.html')
 
-@csrf_exempt
 def vehicle(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -61,10 +83,10 @@ def vehicle(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='V')
         if _method == "delete":
             Vehicle.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='V')
             brand = request.POST.get('brand', "")
             model = request.POST.get('model', "")
             year = request.POST.get('year', "")
@@ -84,10 +106,15 @@ def vehicle(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = Vehicle.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('vehicle')
 
-@csrf_exempt
 def house(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -114,10 +141,10 @@ def house(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='R')
         if _method == "delete":
             House.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='R')
             property_type = request.POST.get('property_type', "")
             lot_width = float(request.POST.get('lot_width', 0))
             lot_depth = float(request.POST.get('lot_depth', 0))
@@ -139,10 +166,15 @@ def house(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = House.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('house')
 
-@csrf_exempt
 def crypto(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -169,10 +201,10 @@ def crypto(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='C')
         if _method == "delete":
             Crypto.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='C')
             coin_name = request.POST.get('coin_name', "")
             amount = int(request.POST.get('amount', 0))
             purchase_price = request.POST.get('purchase_price', "")
@@ -186,10 +218,15 @@ def crypto(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = Crypto.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('crypto')
 
-@csrf_exempt
 def stock(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     ticker = request.GET.get('ticker', None)
     apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
@@ -256,10 +293,10 @@ def stock(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='E')
         if _method == "delete":
             Stock.objects.get(id=id).delete()
         else:
-            asset = Asset.objects.get(category='E')
             share = int(request.POST.get('share', 0))
             ticker_symbol = request.POST.get('ticker_symbol', "")
             market = request.POST.get('market', "")
@@ -277,6 +314,10 @@ def stock(request):
             if id > 0:
                 a.id = id
             a.save()
+        # update asset
+        targets = Stock.objects.all()
+        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.save()
         return redirect('stock')
 
 def stock_search(request, stock_ticker):
@@ -314,6 +355,8 @@ def stock_search(request, stock_ticker):
         return render(request, '_stock_verify.html', context)
 
 def user(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         total = User.objects.count()
@@ -331,6 +374,8 @@ def user(request):
         return render(request, 'user/index.html', context)
 
 def asset(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
     context = {}
     if request.method == "GET":
         total = Asset.objects.count()

@@ -35,24 +35,35 @@
                                 <a class="navbar-item" href="/home">
                                     Home
                                 </a>
-                                <a class="navbar-item" href="/user">
+                                <a class="navbar-item {% if request.path == '/user' %}is-active{% endif %}" href="/user">
                                     User
                                 </a>
-                                <a class="navbar-item" href="/asset">
+                                <a class="navbar-item {% if request.path == '/asset' %}is-active{% endif %}" href="/asset">
                                     Asset
                                 </a>
-                                <a class="navbar-item" href="/vehicle">
+                                <a class="navbar-item {% if request.path == '/vehicle' %}is-active{% endif %}" href="/vehicle">
                                     Vehicle
                                 </a>
-                                <a class="navbar-item" href="/house">
+                                <a class="navbar-item {% if request.path == '/house' %}is-active{% endif %}" href="/house">
                                     House
                                 </a>
-                                <a class="navbar-item" href="/crypto">
+                                <a class="navbar-item {% if request.path == '/crypto' %}is-active{% endif %}" href="/crypto">
                                     Crypto
                                 </a>
-                                <a class="navbar-item" href="/stock">
+                                <a class="navbar-item {% if request.path == '/stock' %}is-active{% endif %}" href="/stock">
                                     Stock
                                 </a>
+                            </div>
+                            <div class="navbar-end">
+                                {% if request.path != '/login' %}
+                                    <div class="navbar-item">
+                                        <div class="buttons">
+                                          <a class="button is-danger is-outlined" href="/logout">
+                                            Log Out
+                                          </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </nav>

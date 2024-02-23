@@ -31,7 +31,7 @@ class User(AbstractUser):
     first_name = models.CharField("first name", max_length=255, blank=True)
     last_name = models.CharField("last name", max_length=255, blank=True)
     gender = models.CharField(choices=GENDER_CHOICE, max_length=1, default='N')
-    age =  models.SmallIntegerField(default=18)
+    age = models.SmallIntegerField(default=18)
     profile = models.ImageField(upload_to=profile_path, default="")
 
 
