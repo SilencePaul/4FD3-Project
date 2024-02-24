@@ -10,6 +10,7 @@ or
 
 ## Run Server
 
+If you changed `models.py` file, run `python manage.py migrate`
 `python manage.py runserver`
 
 ## Directory Description
