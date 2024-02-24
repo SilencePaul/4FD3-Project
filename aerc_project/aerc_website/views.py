@@ -294,7 +294,7 @@ def stock(request):
                 # Generate the Plot for html
                 dates = [datetime.utcfromtimestamp(item['t'] / 1000).date() for item in data['results']]
                 closing_prices = [item['c'] for item in data['results']]
-                
+
                 return render(request, 'stock/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
