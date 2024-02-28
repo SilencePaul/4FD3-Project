@@ -16,6 +16,7 @@
                     <td>Parking</td>
                     <td>Purchase Price</td>
                     <td>Purchase Date</td>
+                    <td>Present Value</td>
                     <td>
                         <a class="button is-primary is-small" href="?vt=detail">Add</a>
                     </td>
@@ -32,6 +33,7 @@
                     <td>{{ x.parking }}</td>
                     <td>{{ x.purchase_price }}</td>
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
+                    <td>{{ x.price_history.0.value | floatformat }}</td>
                     <td>
                         <form action="house" method="post">
                             <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
