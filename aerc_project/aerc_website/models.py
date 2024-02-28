@@ -2,6 +2,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+from django.dispatch import receiver
+from django.db.models.signals import pre_save, post_save, pre_delete, post_delete, pre_init, post_init
+from .aes_enc import DataCipher
+from .sha_hash import DataHasher
+
+cipher = DataCipher(b"secret", b"123456")
+hasher = DataHasher()
 
 def profile_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -33,7 +40,33 @@ class User(AbstractUser):
     gender = models.CharField(choices=GENDER_CHOICE, max_length=1, default='N')
     age = models.SmallIntegerField(default=18)
     profile = models.ImageField(upload_to=profile_path, default="")
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
 
+@receiver(pre_save, sender=User)
+def encrypt_user(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.email, instance.first_name, instance.last_name, instance.gender)
+        instance.email = cipher.encrypt(instance.email)
+        instance.first_name = cipher.encrypt(instance.first_name)
+        instance.last_name = cipher.encrypt(instance.last_name)
+        instance.gender = cipher.encrypt(instance.gender)
+
+@receiver(post_init, sender=User)
+def decrypt_user(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.email = cipher.decrypt(instance.email)
+            instance.first_name = cipher.decrypt(instance.first_name)
+            instance.last_name = cipher.decrypt(instance.last_name)
+            instance.gender = cipher.decrypt(instance.gender)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.email, instance.first_name, instance.last_name, instance.gender)
+        except:
+            print("user wasn't encrypted")
 
 class Asset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -49,6 +82,8 @@ class Vehicle(models.Model):
     model = models.CharField(max_length=20, default='')
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateField()
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
 
     class Meta:
         ordering = ["purchase_date"]
@@ -57,6 +92,31 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year})"
+
+@receiver(pre_save, sender=Vehicle)
+def encrypt_vehicle(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.color, instance.brand, instance.VIN, instance.model)
+        instance.color = cipher.encrypt(instance.color)
+        instance.brand = cipher.encrypt(instance.brand)
+        instance.VIN = cipher.encrypt(instance.VIN)
+        instance.model = cipher.encrypt(instance.model)
+
+@receiver(post_init, sender=Vehicle)
+def decrypt_vehicle(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.color = cipher.decrypt(instance.color)
+            instance.brand = cipher.decrypt(instance.brand)
+            instance.VIN = cipher.decrypt(instance.VIN)
+            instance.model = cipher.decrypt(instance.model)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.color, instance.brand, instance.VIN, instance.model)
+        except:
+            print("vehicle wasn't encrypted")
     
 class Stock(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
@@ -70,6 +130,8 @@ class Stock(models.Model):
     market = models.CharField(max_length=10, default='', db_index=True)
     currency = models.CharField(max_length=3, default='')
     purchase_date = models.DateField()
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
 
     class Meta:
         ordering = ["ticker_symbol"]
@@ -79,6 +141,29 @@ class Stock(models.Model):
     
     def __str__(self):
         return f"{self.ticker_symbol} ({self.market})"
+
+@receiver(pre_save, sender=Stock)
+def encrypt_stock(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.ticker_symbol, instance.market, instance.currency)
+        instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
+        instance.market = cipher.encrypt(instance.market)
+        instance.currency = cipher.encrypt(instance.currency)
+
+@receiver(post_init, sender=Stock)
+def decrypt_stock(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
+            instance.market = cipher.decrypt(instance.market)
+            instance.currency = cipher.decrypt(instance.currency)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.ticker_symbol, instance.market, instance.currency)
+        except:
+            print("stock wasn't encrypted")
 
 class StockTransaction(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
@@ -104,6 +189,27 @@ class Crypto(models.Model):
     amount = models.IntegerField(default=0)
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
+
+@receiver(pre_save, sender=Crypto)
+def encrypt_crypto(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.coin_name)
+        instance.coin_name = cipher.encrypt(instance.coin_name)
+
+@receiver(post_init, sender=Crypto)
+def decrypt_crypto(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.coin_name = cipher.decrypt(instance.coin_name)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.coin_name)
+        except:
+            print("crypto wasn't encrypted")
 
 class House(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
@@ -115,6 +221,27 @@ class House(models.Model):
     parking = models.SmallIntegerField(default=0)
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
+
+@receiver(pre_save, sender=House)
+def encrypt_house(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.property_type)
+        instance.property_type = cipher.encrypt(instance.property_type)
+
+@receiver(post_init, sender=House)
+def decrypt_house(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.property_type = cipher.decrypt(instance.property_type)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.property_type)
+        except:
+            print("house wasn't encrypted")
     
 class HousingIndex(models.Model):
     location = models.CharField(max_length=50, default='Canada')

@@ -18,7 +18,7 @@
                 </thead>
                 <tbody>
                     {% for x in data %}
-                        <tr>
+                        <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
                             <td>{{ x.email }}</td>
                             <td>{{ x.first_name }}</td>
                             <td>{{ x.last_name }}</td>
