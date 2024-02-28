@@ -23,7 +23,7 @@
                 </thead>
                 <tbody>
                 {% for x in data %}
-                <tr>
+                <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
                     <td>{{ x.property_type }}</td>
                     <td>{{ x.lot_width }}</td>
                     <td>{{ x.lot_depth }}</td>

@@ -21,7 +21,7 @@
                 </thead>
                 <tbody>
                 {% for x in data %}
-                <tr>
+                <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
                     <td>{{ x.share }}</td>
                     <td>{{ x.ticker_symbol }}</td>
                     <td>{{ x.market }}</td>

@@ -22,7 +22,7 @@
                     </thead>
                     <tbody>
                     {% for x in data %}
-                    <tr>
+                    <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
                         <td>{{ x.brand }}</td>
                         <td>{{ x.model }}</td>
                         <td>{{ x.year }}</td>
