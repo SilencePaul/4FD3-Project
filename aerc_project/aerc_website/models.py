@@ -25,6 +25,51 @@ class AssetType(models.Model):
         ('O', 'Other')
     ]
 
+
+class LocationCategory(models.Model):
+    CHOICES = [
+        ('CA' ,'Canada'),
+        ('AT' ,'Atlantic Region'),
+        ('NL' ,'Newfoundland and Labrador'),
+        ('SJ' ,"St. John's, Newfoundland and Labrador"),
+        ('PEI' ,'Prince Edward Island'),
+        ('CT' ,'Charlottetown, Prince Edward Island'),
+        ('NS' ,'Nova Scotia'),
+        ('HF' ,'Halifax, Nova Scotia'),
+        ('NB' ,'New Brunswick'),
+        ('SJFM' ,'Saint John, Fredericton, and Moncton, New Brunswick'),
+        ('QC' ,'Quebec'),
+        ('QEC' ,'Québec, Quebec'),
+        ('SB' ,'Sherbrooke, Quebec'),
+        ('TR' ,'Trois-Rivières, Quebec'),
+        ('MTL' ,'Montréal, Quebec'),
+        ('OGQ' ,'Ottawa-Gatineau, Quebec part, Ontario/Quebec'),
+        ('ON' ,'Ontario'),
+        ('OGO' ,'Ottawa-Gatineau, Ontario part, Ontario/Quebec'),
+        ('OSW' ,'Oshawa, Ontario'),
+        ('TNT' ,'Toronto, Ontario'),
+        ('HT' ,'Hamilton, Ontario'),
+        ('SC' ,'St. Catharines-Niagara, Ontario'),
+        ('KCW' ,'Kitchener-Cambridge-Waterloo, Ontario'),
+        ('GH' ,'Guelph, Ontario'),
+        ('LD' ,'London, Ontario'),
+        ('WS' ,'Windsor, Ontario'),
+        ('SY' ,'Greater Sudbury, Ontario'),
+        ('PR' ,'Prairie Region'),
+        ('MT' ,'Manitoba'),
+        ('WP' ,'Winnipeg, Manitoba'),
+        ('SA' ,'Saskatchewan'),
+        ('RGA' ,'Regina, Saskatchewan'),
+        ('SKT' ,'Saskatoon, Saskatchewan'),
+        ('ABT' ,'Alberta'),
+        ('CGY' ,'Calgary, Alberta'),
+        ('ED' ,'Edmonton, Alberta'),
+        ('BC' ,'British Columbia'),
+        ('KN' ,'Kelowna, British Columbia'),
+        ('VNC' ,'Vancouver, British Columbia'),
+        ('VCA' ,'Victoria, British Columbia'),
+    ]
+
 class User(AbstractUser):
     GENDER_CHOICE = [
         ('F', 'Female'),
@@ -214,6 +259,7 @@ def decrypt_crypto(sender, instance, **kwargs):
 class House(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     property_type = models.CharField(max_length=10, default='')
+    location = models.CharField(choices=LocationCategory.CHOICES, max_length=5, default='CA')
     lot_width = models.FloatField(default=0)
     lot_depth = models.FloatField(default=0)
     bedroom = models.SmallIntegerField(default=0)
@@ -223,6 +269,13 @@ class House(models.Model):
     purchase_date = models.DateTimeField(auto_now_add=True)
     checksum = models.CharField("checksum", max_length=255, blank=True)
     checksumOk = False
+    @property
+    def price_history(self):
+        index_history = HousingIndex.objects.filter(location=self.get_location_display()).order_by('-date')
+        purchase_idx = index_history.filter(date__year=self.purchase_date.year, date__month=self.purchase_date.month).first()  
+        purchase_idx_value = purchase_idx.index if purchase_idx else index_history[0].index # Use index value from the purchasing month if exists
+        print([{"month": r.date, "value": r.index/purchase_idx_value*self.purchase_price, "ratio": r.index/purchase_idx_value} for r in index_history[:120]])
+        return [{"month": r.date, "value": r.index/purchase_idx_value*self.purchase_price, "ratio": r.index/purchase_idx_value} for r in index_history[:120]] # return record for last 10 years
 
 @receiver(pre_save, sender=House)
 def encrypt_house(sender, instance, **kwargs):
