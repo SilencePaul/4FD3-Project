@@ -16,7 +16,10 @@ class DataCipher:
         return base64.encodebytes(cipher_data).decode(self.encoding)
 
     def decrypt(self, b64: str):
-        aes = AES.new(self.key, AES.MODE_CBC, iv=self.iv)
-        cipher_data = base64.decodebytes(b64.encode(self.encoding))
-        plain_data = unpad(aes.decrypt(cipher_data), AES.block_size)
-        return plain_data.decode(self.encoding)
+        try:
+            aes = AES.new(self.key, AES.MODE_CBC, iv=self.iv)
+            cipher_data = base64.decodebytes(b64.encode(self.encoding))
+            plain_data = unpad(aes.decrypt(cipher_data), AES.block_size)
+            return plain_data.decode(self.encoding)
+        except:
+            return b64

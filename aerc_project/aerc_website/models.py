@@ -48,7 +48,7 @@ def encrypt_user(sender, instance, **kwargs):
     if instance.id is None:
         pass
     else:
-        instance.checksum = hasher.hash(instance.email, instance.first_name, instance.last_name, instance.gender)
+        instance.checksum = hasher.hash(instance.username, instance.email, instance.first_name, instance.last_name, instance.gender)
         instance.email = cipher.encrypt(instance.email)
         instance.first_name = cipher.encrypt(instance.first_name)
         instance.last_name = cipher.encrypt(instance.last_name)
@@ -64,9 +64,9 @@ def decrypt_user(sender, instance, **kwargs):
             instance.first_name = cipher.decrypt(instance.first_name)
             instance.last_name = cipher.decrypt(instance.last_name)
             instance.gender = cipher.decrypt(instance.gender)
-            instance.checksumOk = hasher.verify(instance.checksum, instance.email, instance.first_name, instance.last_name, instance.gender)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.username, instance.email, instance.first_name, instance.last_name, instance.gender)
         except:
-            print("user wasn't encrypted")
+            print("decrypt_user except")
 
 class Asset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -116,7 +116,7 @@ def decrypt_vehicle(sender, instance, **kwargs):
             instance.model = cipher.decrypt(instance.model)
             instance.checksumOk = hasher.verify(instance.checksum, instance.color, instance.brand, instance.VIN, instance.model)
         except:
-            print("vehicle wasn't encrypted")
+            print("decrypt_vehicle except")
     
 class Stock(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
@@ -163,7 +163,7 @@ def decrypt_stock(sender, instance, **kwargs):
             instance.currency = cipher.decrypt(instance.currency)
             instance.checksumOk = hasher.verify(instance.checksum, instance.ticker_symbol, instance.market, instance.currency)
         except:
-            print("stock wasn't encrypted")
+            print("decrypt_stock except")
 
 class StockTransaction(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
@@ -209,7 +209,7 @@ def decrypt_crypto(sender, instance, **kwargs):
             instance.coin_name = cipher.decrypt(instance.coin_name)
             instance.checksumOk = hasher.verify(instance.checksum, instance.coin_name)
         except:
-            print("crypto wasn't encrypted")
+            print("decrypt_crypto except")
 
 class House(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
@@ -241,7 +241,7 @@ def decrypt_house(sender, instance, **kwargs):
             instance.property_type = cipher.decrypt(instance.property_type)
             instance.checksumOk = hasher.verify(instance.checksum, instance.property_type)
         except:
-            print("house wasn't encrypted")
+            print("decrypt_house except")
     
 class HousingIndex(models.Model):
     location = models.CharField(max_length=50, default='Canada')
