@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+import matplotlib
 import requests
 from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType
 from enum import Enum, auto
@@ -294,6 +295,19 @@ def stock(request):
                 # Generate the Plot for html
                 dates = [datetime.utcfromtimestamp(item['t'] / 1000).date() for item in data['results']]
                 closing_prices = [item['c'] for item in data['results']]
+                matplotlib.use('Agg')
+                fig, ax = plt.subplots()
+                ax.plot(dates, closing_prices, label=ticker)
+                ax.axhline(y=purchase_price, color='r', linestyle='--', label='Purchase Price')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Price')
+                ax.set_title(f'{ticker} Stock Price')
+                ax.legend()
+                img = io.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                plot_url = base64.b64encode(img.getvalue()).decode()
+                context['plot_url'] = f'data:image/png;base64,{plot_url}'
                 
                 return render(request, 'stock/detail.html', context)
     if request.method == "POST":
