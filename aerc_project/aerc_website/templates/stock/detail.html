@@ -34,17 +34,31 @@
                             <td>Purchase Date</td>
                             <td>{{ data.purchase_date|date:'Y-m-d' }}</td>
                         </tr>
+                        <tr>
+                            <td>Total Return</td>
+                            {% if total_return > 0 %}
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return }}</td>
+                            {% else %}
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return }}</td>
+                            {% endif %}
+                        </tr>
                     </tbody>
                 </table>
             </table>
         </div>
         <div class="stock-info-graph">
-            <img src="{{ plot_url }}" alt="Stock Price Plot">
+            <div class="container">
+                <div class="columns is-vcentered is-centered">
+                    <div class="column is-half">
+                        <figure class="image">
+                            <img src={{plot_url}} alt="Graph Image">
+                        </figure>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
-        </p>
-    </div>
     
 </section>
 {% endblock %}

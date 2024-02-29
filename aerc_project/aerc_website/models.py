@@ -116,7 +116,7 @@ def decrypt_user(sender, instance, **kwargs):
 class Asset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(choices=AssetType.CHOICES, max_length=1, default='O')
-    current_value = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    current_value = models.FloatField()
 
 class Vehicle(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
@@ -167,11 +167,7 @@ class Stock(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     share = models.PositiveIntegerField(default=0)
     ticker_symbol = models.CharField(max_length=5, default='', db_index=True)
-    purchase_price = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        default=Decimal('0.00'), 
-        validators=[MinValueValidator(Decimal('0.00'))])
+    purchase_price = models.FloatField()
     market = models.CharField(max_length=10, default='', db_index=True)
     currency = models.CharField(max_length=3, default='')
     purchase_date = models.DateField()
@@ -214,11 +210,7 @@ class StockTransaction(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
     transaction_date = models.DateTimeField()
     share = models.IntegerField(default=0)
-    price = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        default=Decimal('0.00'), 
-        validators=[MinValueValidator(Decimal('0.00'))])
+    price = models.FloatField()
 
     class Meta:
         ordering = ["transaction_date"]

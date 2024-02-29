@@ -302,13 +302,21 @@ def stock(request):
                 ax.set_xlabel('Date')
                 ax.set_ylabel('Price')
                 ax.set_title(f'{ticker} Stock Price')
+                plt.xticks(rotation=45)
+                plt.tight_layout()
                 ax.legend()
                 img = io.BytesIO()
                 plt.savefig(img, format='png')
                 img.seek(0)
                 plot_url = base64.b64encode(img.getvalue()).decode()
                 context['plot_url'] = f'data:image/png;base64,{plot_url}'
-                
+
+                current_price = closing_prices[-1]
+                current_total_value = stock_data.share * current_price
+                purchase_total_value = stock_data.share * purchase_price
+                total_return = current_total_value - purchase_total_value
+                context['total_return'] = total_return
+
                 return render(request, 'stock/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
