@@ -10,6 +10,8 @@ or
 
 ## Run Server
 
+If you changed `models.py` file, run `python manage.py makemigrations` and `python manage.py migrate`.
+
 `python manage.py runserver`
 
 ## Directory Description
@@ -18,6 +20,10 @@ or
 - Any static references like `.css`, `.jpg`, `.js` files in `static` folder.
 - View controllers in `views.py` file. Use `request` parameter to know request header and params. Use `render` function to respond browser a web view that save in the `templates` folder.
 - Route config in `urls.py` file. Map the route path to view controllers.
+
+## Management
+
+- Development environment password `aerc_admin$2024`
 
 ## Help Links
 

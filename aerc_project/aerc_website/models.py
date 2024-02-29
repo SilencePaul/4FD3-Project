@@ -2,6 +2,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
 from decimal import Decimal
+from django.dispatch import receiver
+from django.db.models.signals import pre_save, post_save, pre_delete, post_delete, pre_init, post_init
+from .aes_enc import DataCipher
+from .sha_hash import DataHasher
+
+cipher = DataCipher(b"secret", b"123456")
+hasher = DataHasher()
 
 def profile_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -16,6 +23,51 @@ class AssetType(models.Model):
         ('V', 'Vehicle'),
         ('M', 'Saving'),
         ('O', 'Other')
+    ]
+
+
+class LocationCategory(models.Model):
+    CHOICES = [
+        ('CA' ,'Canada'),
+        ('AT' ,'Atlantic Region'),
+        ('NL' ,'Newfoundland and Labrador'),
+        ('SJ' ,"St. John's, Newfoundland and Labrador"),
+        ('PEI' ,'Prince Edward Island'),
+        ('CT' ,'Charlottetown, Prince Edward Island'),
+        ('NS' ,'Nova Scotia'),
+        ('HF' ,'Halifax, Nova Scotia'),
+        ('NB' ,'New Brunswick'),
+        ('SJFM' ,'Saint John, Fredericton, and Moncton, New Brunswick'),
+        ('QC' ,'Quebec'),
+        ('QEC' ,'Québec, Quebec'),
+        ('SB' ,'Sherbrooke, Quebec'),
+        ('TR' ,'Trois-Rivières, Quebec'),
+        ('MTL' ,'Montréal, Quebec'),
+        ('OGQ' ,'Ottawa-Gatineau, Quebec part, Ontario/Quebec'),
+        ('ON' ,'Ontario'),
+        ('OGO' ,'Ottawa-Gatineau, Ontario part, Ontario/Quebec'),
+        ('OSW' ,'Oshawa, Ontario'),
+        ('TNT' ,'Toronto, Ontario'),
+        ('HT' ,'Hamilton, Ontario'),
+        ('SC' ,'St. Catharines-Niagara, Ontario'),
+        ('KCW' ,'Kitchener-Cambridge-Waterloo, Ontario'),
+        ('GH' ,'Guelph, Ontario'),
+        ('LD' ,'London, Ontario'),
+        ('WS' ,'Windsor, Ontario'),
+        ('SY' ,'Greater Sudbury, Ontario'),
+        ('PR' ,'Prairie Region'),
+        ('MT' ,'Manitoba'),
+        ('WP' ,'Winnipeg, Manitoba'),
+        ('SA' ,'Saskatchewan'),
+        ('RGA' ,'Regina, Saskatchewan'),
+        ('SKT' ,'Saskatoon, Saskatchewan'),
+        ('ABT' ,'Alberta'),
+        ('CGY' ,'Calgary, Alberta'),
+        ('ED' ,'Edmonton, Alberta'),
+        ('BC' ,'British Columbia'),
+        ('KN' ,'Kelowna, British Columbia'),
+        ('VNC' ,'Vancouver, British Columbia'),
+        ('VCA' ,'Victoria, British Columbia'),
     ]
 
 class User(AbstractUser):
@@ -33,7 +85,33 @@ class User(AbstractUser):
     gender = models.CharField(choices=GENDER_CHOICE, max_length=1, default='N')
     age = models.SmallIntegerField(default=18)
     profile = models.ImageField(upload_to=profile_path, default="")
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
 
+@receiver(pre_save, sender=User)
+def encrypt_user(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.username, instance.email, instance.first_name, instance.last_name, instance.gender)
+        instance.email = cipher.encrypt(instance.email)
+        instance.first_name = cipher.encrypt(instance.first_name)
+        instance.last_name = cipher.encrypt(instance.last_name)
+        instance.gender = cipher.encrypt(instance.gender)
+
+@receiver(post_init, sender=User)
+def decrypt_user(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.email = cipher.decrypt(instance.email)
+            instance.first_name = cipher.decrypt(instance.first_name)
+            instance.last_name = cipher.decrypt(instance.last_name)
+            instance.gender = cipher.decrypt(instance.gender)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.username, instance.email, instance.first_name, instance.last_name, instance.gender)
+        except:
+            print("decrypt_user except")
 
 class Asset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -49,6 +127,8 @@ class Vehicle(models.Model):
     model = models.CharField(max_length=20, default='')
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateField()
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
 
     class Meta:
         ordering = ["purchase_date"]
@@ -57,6 +137,31 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year})"
+
+@receiver(pre_save, sender=Vehicle)
+def encrypt_vehicle(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.color, instance.brand, instance.VIN, instance.model)
+        instance.color = cipher.encrypt(instance.color)
+        instance.brand = cipher.encrypt(instance.brand)
+        instance.VIN = cipher.encrypt(instance.VIN)
+        instance.model = cipher.encrypt(instance.model)
+
+@receiver(post_init, sender=Vehicle)
+def decrypt_vehicle(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.color = cipher.decrypt(instance.color)
+            instance.brand = cipher.decrypt(instance.brand)
+            instance.VIN = cipher.decrypt(instance.VIN)
+            instance.model = cipher.decrypt(instance.model)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.color, instance.brand, instance.VIN, instance.model)
+        except:
+            print("decrypt_vehicle except")
     
 class Stock(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
@@ -70,6 +175,8 @@ class Stock(models.Model):
     market = models.CharField(max_length=10, default='', db_index=True)
     currency = models.CharField(max_length=3, default='')
     purchase_date = models.DateField()
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
 
     class Meta:
         ordering = ["ticker_symbol"]
@@ -79,6 +186,29 @@ class Stock(models.Model):
     
     def __str__(self):
         return f"{self.ticker_symbol} ({self.market})"
+
+@receiver(pre_save, sender=Stock)
+def encrypt_stock(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.ticker_symbol, instance.market, instance.currency)
+        instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
+        instance.market = cipher.encrypt(instance.market)
+        instance.currency = cipher.encrypt(instance.currency)
+
+@receiver(post_init, sender=Stock)
+def decrypt_stock(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
+            instance.market = cipher.decrypt(instance.market)
+            instance.currency = cipher.decrypt(instance.currency)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.ticker_symbol, instance.market, instance.currency)
+        except:
+            print("decrypt_stock except")
 
 class StockTransaction(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
@@ -104,10 +234,32 @@ class Crypto(models.Model):
     amount = models.IntegerField(default=0)
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
+
+@receiver(pre_save, sender=Crypto)
+def encrypt_crypto(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.coin_name)
+        instance.coin_name = cipher.encrypt(instance.coin_name)
+
+@receiver(post_init, sender=Crypto)
+def decrypt_crypto(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.coin_name = cipher.decrypt(instance.coin_name)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.coin_name)
+        except:
+            print("decrypt_crypto except")
 
 class House(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     property_type = models.CharField(max_length=10, default='')
+    location = models.CharField(choices=LocationCategory.CHOICES, max_length=5, default='CA')
     lot_width = models.FloatField(default=0)
     lot_depth = models.FloatField(default=0)
     bedroom = models.SmallIntegerField(default=0)
@@ -115,6 +267,34 @@ class House(models.Model):
     parking = models.SmallIntegerField(default=0)
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateTimeField(auto_now_add=True)
+    checksum = models.CharField("checksum", max_length=255, blank=True)
+    checksumOk = False
+    @property
+    def price_history(self):
+        index_history = HousingIndex.objects.filter(location=self.get_location_display()).order_by('-date')
+        purchase_idx = index_history.filter(date__year=self.purchase_date.year, date__month=self.purchase_date.month).first()  
+        purchase_idx_value = purchase_idx.index if purchase_idx else index_history[0].index # Use index value from the purchasing month if exists
+        print([{"month": r.date, "value": r.index/purchase_idx_value*self.purchase_price, "ratio": r.index/purchase_idx_value} for r in index_history[:120]])
+        return [{"month": r.date, "value": r.index/purchase_idx_value*self.purchase_price, "ratio": r.index/purchase_idx_value} for r in index_history[:120]] # return record for last 10 years
+
+@receiver(pre_save, sender=House)
+def encrypt_house(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        instance.checksum = hasher.hash(instance.property_type)
+        instance.property_type = cipher.encrypt(instance.property_type)
+
+@receiver(post_init, sender=House)
+def decrypt_house(sender, instance, **kwargs):
+    if instance.id is None:
+        pass
+    else:
+        try:
+            instance.property_type = cipher.decrypt(instance.property_type)
+            instance.checksumOk = hasher.verify(instance.checksum, instance.property_type)
+        except:
+            print("decrypt_house except")
     
 class HousingIndex(models.Model):
     location = models.CharField(max_length=50, default='Canada')

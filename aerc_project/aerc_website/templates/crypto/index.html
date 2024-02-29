@@ -19,7 +19,7 @@
                 </thead>
                 <tbody>
                 {% for x in data %}
-                <tr>
+                <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
                     <td>{{ x.coin_name }}</td>
                     <td>{{ x.amount }}</td>
                     <td>{{ x.purchase_price }}</td>
