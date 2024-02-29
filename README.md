@@ -8,6 +8,10 @@
 or
 `python3.11 -m pip install -r requirements.txt`
 
+## Change Admin Password
+
+`python manage.py changepassword admin`
+
 ## Run Server
 
 If you changed `models.py` file, run `python manage.py makemigrations` and `python manage.py migrate`.
