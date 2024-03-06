@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
-from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType
+from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory
 from enum import Enum, auto
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -139,11 +139,40 @@ def house(request):
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'house/index.html', context)
-        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+        elif VIEWTYPE[viewtype] is VIEWTYPE.edit:
             id = int(request.GET.get('id', 0))
             context['id'] = id
             if id > 0:
                 context['data'] = House.objects.get(id=id)
+                context['locations'] = LocationCategory.objects.all()
+                print(context['locations'])
+            return render(request, 'house/edit.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                house_data = House.objects.get(id=id)
+                context['data'] = house_data
+                context['total_return'] = house_data.price_history[-1]['value'] - house_data.purchase_price
+
+                # Generate the Plot for html
+                months = [p['month'].date() for p in house_data.price_history]
+                prices = [p['value'] for p in house_data.price_history]
+                matplotlib.use('Agg')
+                fig, ax = plt.subplots()
+                ax.plot(months, prices, label=house_data)
+                ax.axhline(y=house_data.purchase_price, color='r', linestyle='--', label='Purchase Price')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Price')
+                ax.set_title(f'{house_data} House Price')
+                plt.xticks(rotation=45)
+                plt.tight_layout()
+                ax.legend()
+                img = io.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                plot_url = base64.b64encode(img.getvalue()).decode()
+                context['plot_url'] = f'data:image/png;base64,{plot_url}'
             return render(request, 'house/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
@@ -153,6 +182,9 @@ def house(request):
             House.objects.get(id=id).delete()
         else:
             property_type = request.POST.get('property_type', "")
+            address = request.POST.get('address', "")
+            street_number = request.POST.get('street_number', "")
+            postal_code = request.POST.get('postal_code', "")
             lot_width = float(request.POST.get('lot_width', 0))
             lot_depth = float(request.POST.get('lot_depth', 0))
             bedroom = int(request.POST.get('bedroom', 0))
@@ -163,6 +195,9 @@ def house(request):
             a = House(
                 asset_id=asset.id,
                 property_type=property_type,
+                address=address,
+                street_number=street_number,
+                postal_code=postal_code,
                 lot_width=lot_width,
                 lot_depth=lot_depth,
                 bedroom=bedroom,

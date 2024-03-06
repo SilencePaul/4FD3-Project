@@ -9,16 +9,12 @@
                 <thead>
                 <tr>
                     <td>Property Type</td>
-                    <td>Lot Width</td>
-                    <td>Lot Depth</td>
-                    <td>Bedroom</td>
-                    <td>Bathroom</td>
-                    <td>Parking</td>
+                    <td>Name</td>
                     <td>Purchase Price</td>
                     <td>Purchase Date</td>
                     <td>Present Value</td>
                     <td>
-                        <a class="button is-primary is-small" href="?vt=detail">Add</a>
+                        <a class="button is-primary is-small" href="?vt=edit">Add</a>
                     </td>
                 </tr>
                 </thead>
@@ -26,17 +22,15 @@
                 {% for x in data %}
                 <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
                     <td>{{ x.property_type }}</td>
-                    <td>{{ x.lot_width }}</td>
-                    <td>{{ x.lot_depth }}</td>
-                    <td>{{ x.bedroom }}</td>
-                    <td>{{ x.bathroom }}</td>
-                    <td>{{ x.parking }}</td>
+                    <td>{{ x }}</td>
                     <td>{{ x.purchase_price }}</td>
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                     <td>{{ x.price_history.0.value | floatformat }}</td>
                     <td>
                         <form action="house" method="post">
-                            <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
+                            {% csrf_token %}
+                            <a class="button is-info is-small" href="?vt=edit&id={{ x.id }}">Edit</a>
+                            <a class="button is-link is-small" href="?vt=detail&id={{ x.id }}">Detail</a>
                             <input type="hidden" name="_method" value="delete" />
                             <input name="id" type="hidden" value="{{ x.id }}"/>
                             <input type="submit" value="Delete" class="button is-danger is-small" />
