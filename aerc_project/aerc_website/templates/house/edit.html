@@ -1,0 +1,170 @@
+{% extends "base.html" %} {% block content %}
+<section class="section">
+  <div class="container">
+    <h2 class="title is-2">House Management</h2>
+    <p class="subtitle is-4">
+      {% if id > 0 %} Edit your house {% else %} Add your new house {% endif %}
+    </p>
+    <form action="house" method="post">
+      {% csrf_token %}
+      <input
+        name="id"
+        type="hidden"
+        value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}"
+      />
+      <div class="field">
+        <label class="label">Street Number</label>
+        <div class="control">
+          <input
+            class="input"
+            name="street_number"
+            placeholder="Street number of your house"
+            type="text"
+            value="{{data.street_number}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Address</label>
+        <div class="control">
+          <input
+            class="input"
+            name="address"
+            placeholder="Your house address"
+            type="text"
+            value="{{data.address}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Postal Code</label>
+        <div class="control">
+          <input
+            class="input"
+            name="postal_code"
+            placeholder="Postal code"
+            type="text"
+            value="{{data.postal_code}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Location</label>
+        <div class="control">
+          <input
+            class="input"
+            name="property_type"
+            placeholder="city/province of your house"
+            type="option"
+            value="{{data.location}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Property Type</label>
+        <div class="control">
+          <input
+            class="input"
+            name="property_type"
+            placeholder="Property type of your house"
+            type="text"
+            value="{{data.property_type}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Lot Width</label>
+        <div class="control">
+          <input
+            class="input"
+            name="lot_width"
+            placeholder="Lot width of your house"
+            type="number"
+            value="{{data.lot_width}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Lot Depth</label>
+        <div class="control">
+          <input
+            class="input"
+            name="lot_depth"
+            placeholder="Lot depth of your house"
+            type="number"
+            value="{{data.lot_depth}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Bedroom</label>
+        <div class="control">
+          <input
+            class="input"
+            name="bedroom"
+            placeholder="Number of bedrooms in your house"
+            type="number"
+            value="{{data.bedroom}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Bathroom</label>
+        <div class="control">
+          <input
+            class="input"
+            name="bathroom"
+            placeholder="Number of bathrooms in your house"
+            type="number"
+            value="{{data.bathroom}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Parking</label>
+        <div class="control">
+          <input
+            class="input"
+            name="parking"
+            placeholder="Parking of your house"
+            type="number"
+            value="{{data.parking}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Purchase Price</label>
+        <div class="control">
+          <input
+            class="input"
+            name="purchase_price"
+            placeholder="Purchase Price"
+            type="text"
+            value="{{data.purchase_price}}"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Purchase Date</label>
+        <div class="control">
+          <input
+            class="input"
+            name="purchase_date"
+            placeholder="Purchase Date"
+            type="date"
+            value="{{data.purchase_date|date:'Y-m-d'}}"
+          />
+        </div>
+      </div>
+      <div class="field is-grouped">
+        <div class="control">
+          <input class="button is-link" type="submit" value="Save" />
+        </div>
+        <div class="control">
+          <a class="button is-link is-light" href="?vt=list">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

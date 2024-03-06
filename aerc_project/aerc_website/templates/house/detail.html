@@ -4,80 +4,65 @@
     <div class="container">
         <h2 class="title is-2">House Management</h2>
         <p class="subtitle is-4">
-            {% if id > 0 %}
-            Edit your house
-            {% else %}
-            Add your new house
-            {% endif %}
+            {{ data }}
         </p>
-        <form action="house" method="post">
-            {% csrf_token %}
-            <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
-            <div class="field">
-                <label class="label">Property Type</label>
-                <div class="control">
-                    <input class="input" name="property_type" placeholder="Property type of your house" type="text"
-                            value="{{data.property_type}}">
+        <div class="container">
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <table class="table is-striped is-hoverable is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <td>Lot Width</td>
+                            <td>{{ data.lot_width }}</td>
+                        </tr>
+                        <tr>
+                            <td>Lot Depth</td>
+                            <td>{{ data.lot_depth }}</td>
+                        </tr>
+                        <tr>
+                            <td>Bedroom</td>
+                            <td>{{ data.bedroom }}</td>
+                        </tr>
+                        <tr>
+                            <td>Bathrooom</td>
+                            <td>{{ data.bathroom }}</td>
+                        </tr>
+                        <tr>
+                            <td>Parking</td>
+                            <td>{{ data.parking }}</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Price</td>
+                            <td>{{ data.purchase_price }}</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Date</td>
+                            <td>{{ data.purchase_date|date:'Y-m-d' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Return</td>
+                            {% if total_return > 0 %}
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return | floatformat }}</td>
+                            {% else %}
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return | floatformat }}</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </table>
+        </div>
+        <div class="stock-info-graph">
+            <div class="container">
+                <div class="columns is-vcentered is-centered">
+                    <div class="column is-half">
+                        <figure class="image">
+                            <img src={{plot_url}} alt="Graph Image">
+                        </figure>
+                    </div>
                 </div>
             </div>
-            <div class="field">
-                <label class="label">Lot Width</label>
-                <div class="control">
-                    <input class="input" name="lot_width" placeholder="Lot width of your house" type="number"
-                            value="{{data.lot_width}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Lot Depth</label>
-                <div class="control">
-                    <input class="input" name="lot_depth" placeholder="Lot depth of your house" type="number"
-                            value="{{data.lot_depth}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Bedroom</label>
-                <div class="control">
-                    <input class="input" name="bedroom" placeholder="Number of bedrooms in your house" type="number"
-                            value="{{data.bedroom}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Bathroom</label>
-                <div class="control">
-                    <input class="input" name="bathroom" placeholder="Number of bathrooms in your house" type="number"
-                            value="{{data.bathroom}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Parking</label>
-                <div class="control">
-                    <input class="input" name="parking" placeholder="Parking of your house" type="number"
-                            value="{{data.parking}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Purchase Price</label>
-                <div class="control">
-                    <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
-                            value="{{data.purchase_price}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Purchase Date</label>
-                <div class="control">
-                    <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
-                            value="{{data.purchase_date|date:'Y-m-d'}}">
-                </div>
-            </div>
-            <div class="field is-grouped">
-                <div class="control">
-                    <input class="button is-link" type="submit" value="Save"/>
-                </div>
-                <div class="control">
-                    <a class="button is-link is-light" href="?vt=list">Cancel</a>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
+</section>
+    
 </section>
 {% endblock %}

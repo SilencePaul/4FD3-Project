@@ -250,6 +250,9 @@ def decrypt_crypto(sender, instance, **kwargs):
 
 class House(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    address = models.CharField(default="", max_length=80)
+    street_number = models.SmallIntegerField(blank=True, null=True)
+    postal_code = models.CharField(default="XXX XXX", max_length=10)
     property_type = models.CharField(max_length=10, default='')
     location = models.CharField(choices=LocationCategory.CHOICES, max_length=5, default='CA')
     lot_width = models.FloatField(default=0)
@@ -266,8 +269,9 @@ class House(models.Model):
         index_history = HousingIndex.objects.filter(location=self.get_location_display()).order_by('-date')
         purchase_idx = index_history.filter(date__year=self.purchase_date.year, date__month=self.purchase_date.month).first()  
         purchase_idx_value = purchase_idx.index if purchase_idx else index_history[0].index # Use index value from the purchasing month if exists
-        print([{"month": r.date, "value": r.index/purchase_idx_value*self.purchase_price, "ratio": r.index/purchase_idx_value} for r in index_history[:120]])
         return [{"month": r.date, "value": r.index/purchase_idx_value*self.purchase_price, "ratio": r.index/purchase_idx_value} for r in index_history[:120]] # return record for last 10 years
+    def __str__(self):
+        return f"{self.street_number} {self.address}"
 
 @receiver(pre_save, sender=House)
 def encrypt_house(sender, instance, **kwargs):
