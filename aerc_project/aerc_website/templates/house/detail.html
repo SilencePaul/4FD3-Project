@@ -39,12 +39,20 @@
                             <td>{{ data.purchase_date|date:'Y-m-d' }}</td>
                         </tr>
                         <tr>
+                            <td>Current Price (market)</td>
+                            <td>${{ current_price }}</td>
+                        </tr>
+                        <tr>
                             <td>Total Return</td>
                             {% if total_return > 0 %}
-                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return | floatformat }}</td>
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>${{ total_return | floatformat }}</td>
                             {% else %}
-                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return | floatformat }}</td>
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>${{ total_return | floatformat }}</td>
                             {% endif %}
+                        </tr>
+                        <tr>
+                            <td>YTD Return(avg.)</td>
+                            <td>{{ ytd_return }}%</td>
                         </tr>
                     </tbody>
                 </table>

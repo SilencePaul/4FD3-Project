@@ -102,10 +102,8 @@ def vehicle(request):
                 # below code adjust for days within the month (i.e. if partial month has elapsed)
                 if current_date.day < vehicle_data.purchase_date.day:
                     months_difference -= 1
-                print("---months_difference---\n",months_difference)
                 owned_months = [vehicle_data.purchase_date + timedelta(days=30 * i) for i in
                                 range(months_difference)]
-                print("---owned_prices---\n", owned_months, "\n---")
                 depreciated_prices = [vehicle_data.purchase_price]  # init the first price in the list
                 for month in range(1, months_difference):
                     # Calculate the year for the current month
@@ -119,14 +117,10 @@ def vehicle(request):
                     # Calculate the years since purchase for this month's depreciation calculation
                     depreciated_value = depreciated_prices[-1] * (1 - depreciation_rate)
                     depreciated_prices.append(depreciated_value)
-
-                print("---depreciated_prices---\n",depreciated_prices,"\n---")
                 context['current_price'] = round(depreciated_prices[-1],2)
                 context['total_return'] = depreciated_prices[-1] - vehicle_data.purchase_price
+                context['ytd_return'] = round((depreciated_prices[-1] - vehicle_data.purchase_price)/vehicle_data.purchase_price/(months_difference/12)*100,2)
                 # Generate the Plot for html
-
-                #months = [p['month'].date() for p in house_data.price_history]
-                #prices = [p['value'] for p in house_data.price_history]
                 matplotlib.use('Agg')
                 fig, ax = plt.subplots()
                 ax.plot(owned_months, depreciated_prices, label=vehicle_data)
@@ -176,8 +170,8 @@ def vehicle(request):
         return redirect('vehicle')
 
 def house(request):
-    if cache.get(IS_LOGGED, False) is not True:
-        return redirect('login')
+    # if cache.get(IS_LOGGED, False) is not True:
+    #     return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -209,13 +203,14 @@ def house(request):
             if id > 0:
                 house_data = House.objects.get(id=id)
                 context['data'] = house_data
-                context['total_return'] = house_data.price_history[-1]['value'] - house_data.purchase_price
+                context['total_return'] = house_data.price_history[0]['value'] - house_data.purchase_price
 
-                # Generate the Plot for html
                 months = [p['month'].date() for p in house_data.price_history]
-                print(months)
                 prices = [p['value'] for p in house_data.price_history]
-                print(prices)
+                context['current_price'] = round(prices[0],2)
+                owned_years = datetime.now().year - house_data.purchase_date.year
+                context['ytd_return'] = round((prices[0] - house_data.purchase_price)/house_data.purchase_price/owned_years*100,2)
+                # Generate the Plot for html
                 matplotlib.use('Agg')
                 fig, ax = plt.subplots()
                 ax.plot(months, prices, label=house_data)
