@@ -18,6 +18,7 @@ class VIEWTYPE(Enum):
     detail = auto()
     edit = auto()
     add = auto()
+    buy_or_sell = auto()
 
 # Create your views here.
 
@@ -295,21 +296,32 @@ def stock(request):
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'stock/index.html', context)
-        elif VIEWTYPE[viewtype] is VIEWTYPE.edit:
+        elif VIEWTYPE[viewtype] is VIEWTYPE.buy_or_sell:
             id = int(request.GET.get('id', 0))
             context['id'] = id
             if id > 0:
                 context['data'] = Stock.objects.get(id=id)
-            return render(request, 'stock/edit.html', context)
+            return render(request, 'stock/buy_or_sell.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.add:
+            if ticker:
+                return render(request, 'stock/add.html', context)
+            else:
+                return render(request, 'stock/new_stock.html')
         elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
             id = int(request.GET.get('id', 0))
             context['id'] = id
             if id > 0:
                 stock_data = Stock.objects.get(id=id)
                 context['data'] = stock_data
+
+                transactions = StockTransaction.objects.filter(stock=stock_data).order_by('purchase_date')
+                context['transactions'] = transactions
+
+                initial_transaction = transactions[0]
+
                 base_url = 'https://api.polygon.io/v2/aggs/ticker/'
                 ticker = stock_data.ticker_symbol
-                date_from = stock_data.purchase_date
+                date_from = initial_transaction.purchase_date
                 date_to = datetime.now().date()
                 purchase_price = stock_data.purchase_price
 
@@ -320,13 +332,38 @@ def stock(request):
                 }
                 response = requests.get(url, params=params)
                 data = response.json()
-                
+
                 # Generate the Plot for html
                 dates = [datetime.utcfromtimestamp(item['t'] / 1000).date() for item in data['results']]
                 closing_prices = [item['c'] for item in data['results']]
+
                 matplotlib.use('Agg')
                 fig, ax = plt.subplots()
                 ax.plot(dates, closing_prices, label=ticker)
+
+                label_added = False
+                start = 1
+                for transaction in transactions:
+                    if not label_added:
+                        ax.plot(transaction.purchase_date, transaction.purchase_price, 'go', label='Transaction')
+                        label_added = True
+                        ax.annotate(
+                            f'{start}',
+                            (transaction.purchase_date, transaction.purchase_price),
+                            textcoords='offset points',
+                            xytext=(0, 5),
+                            ha='center')
+                        start += 1
+                    else:
+                        ax.plot(transaction.purchase_date, transaction.purchase_price, 'go')
+                        ax.annotate(
+                            f'{start}',
+                            (transaction.purchase_date, transaction.purchase_price),
+                            textcoords='offset points',
+                            xytext=(0, 5),
+                            ha='center')
+                        start += 1
+
                 ax.axhline(y=purchase_price, color='r', linestyle='--', label='Purchase Price')
                 ax.set_xlabel('Date')
                 ax.set_ylabel('Price')
@@ -341,9 +378,12 @@ def stock(request):
                 context['plot_url'] = f'data:image/png;base64,{plot_url}'
 
                 current_price = closing_prices[-1]
-                current_total_value = stock_data.share * current_price
-                purchase_total_value = stock_data.share * purchase_price
-                total_return = current_total_value - purchase_total_value
+                total_cost = 0
+                shares_owned = 0
+                for transaction in transactions:
+                    total_cost += transaction.share * transaction.purchase_price
+                    shares_owned += transaction.share
+                total_return = shares_owned * current_price - total_cost
                 context['total_return'] = total_return
 
                 return render(request, 'stock/detail.html', context)
@@ -353,6 +393,22 @@ def stock(request):
         asset = Asset.objects.get(category='E')
         if _method == "delete":
             Stock.objects.get(id=id).delete()
+        elif _method == "buy_or_sell":
+            buy_or_sell = request.POST.get('buy_or_sell', "")
+            share = int(request.POST.get('share', 0))
+            purchase_price = float(request.POST.get('purchase_price', ""))
+            purchase_date = request.POST.get('purchase_date', "")
+            stock = Stock.objects.get(id=id)
+            if buy_or_sell == "sell":
+                share = -share
+            transaction = StockTransaction(
+                stock=stock,
+                share=share,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date)
+            transaction.save()
+            stock.update_on_transaction(transaction)
+            stock.save()
         else:
             share = int(request.POST.get('share', 0))
             ticker_symbol = request.POST.get('ticker_symbol', "")
@@ -360,7 +416,7 @@ def stock(request):
             currency = request.POST.get('currency', "")
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
-            a = Stock(
+            stock = Stock(
                 asset_id=asset.id,
                 share=share,
                 ticker_symbol=ticker_symbol,
@@ -368,9 +424,13 @@ def stock(request):
                 currency=currency,
                 purchase_price=purchase_price,
                 purchase_date=purchase_date)
-            if id > 0:
-                a.id = id
-            a.save()
+            stock.save()
+            initial_transaction = StockTransaction(
+                stock=stock,
+                share=share,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date)
+            initial_transaction.save()
         # update asset
         targets = Stock.objects.all()
         asset.current_value = sum([x.purchase_price for x in targets])
@@ -380,6 +440,12 @@ def stock(request):
 def stock_search(request, stock_ticker):
     context = {}
     if request.method == "GET":
+        stock = Stock.objects.filter(ticker_symbol=stock_ticker)
+        if stock:
+            context["stock"] = stock[0]
+            render(request, '_stock_verify.html', context)
+        else:
+            context["stock"] = None
         stock_ticker = stock_ticker.upper()
         params = {
             "apiKey": "wW55pKJzExsThjPDizKdf8OAdDfkvLPW",

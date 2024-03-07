@@ -1,5 +1,43 @@
-{% if result_count == 1 %}
-    <p class="has-text-success">Stock Ticker Verification Pass</p>
+{% if stock %}
+    <p class="has-text-success">{{ stock.ticker_symbol }} has been already added.</p>
+    <p class="has-text-success">You can edit the share from here.</p>
+    <a href="{% url 'stock' %}?vt=buy_or_sell&id={{ stock.id }}">
+        <button class="button is-success">
+            <i class="fa fa-plus"></i>Buy or Sell
+        </button>
+    </a>
+{% else %}
+    {% if result_count == 1 %}
+        <p class="has-text-success">Stock Ticker Verification Pass</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Company Name</th>
+                    <th>Market</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in result_list %}
+                <tr>
+                    <td>{{ result.ticker }}</td>
+                    <td>{{ result.name }}</td>
+                    <td>{{ result.market }}</td>
+                    <td>
+                        <a href="{% url 'stock' %}?vt=add&ticker={{ result.ticker }}">
+                            <button class="button is-success">
+                                <i class="fa fa-plus"></i>ADD
+                            </button>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="has-text-danger">Stock Ticker Verification Fail.</p>
+        <p class="has-text-danger">Here are some possible ticker and company name matched.</p>
     <table class="table">
         <thead>
             <tr>
@@ -16,7 +54,7 @@
                 <td>{{ result.name }}</td>
                 <td>{{ result.market }}</td>
                 <td>
-                    <a href="{% url 'stock' %}?vt=edit&ticker={{ result.ticker }}">
+                    <a href="{% url 'stock' %}?vt=add&ticker={{ result.ticker }}">
                         <button class="button is-success">
                             <i class="fa fa-plus"></i>ADD
                         </button>
@@ -26,33 +64,5 @@
             {% endfor %}
         </tbody>
     </table>
-{% else %}
-    <p class="has-text-danger">Stock Ticker Verification Fail.</p>
-    <p class="has-text-danger">Here are some possible ticker and company name matched.</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Ticker</th>
-            <th>Company Name</th>
-            <th>Market</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for result in result_list %}
-        <tr>
-            <td>{{ result.ticker }}</td>
-            <td>{{ result.name }}</td>
-            <td>{{ result.market }}</td>
-            <td>
-                <a href="{% url 'stock' %}?vt=edit&ticker={{ result.ticker }}">
-                    <button class="button is-success">
-                        <i class="fa fa-plus"></i>ADD
-                    </button>
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    {% endif %}
 {% endif %}

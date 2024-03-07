@@ -15,7 +15,7 @@
                     <td>Purchase Price</td>
                     <td>Purchase Date</td>
                     <td>
-                        <a class="button is-primary is-small" href="?vt=edit">Add</a>
+                        <a class="button is-primary is-small" href="?vt=add">Add</a>
                     </td>
                 </tr>
                 </thead>
@@ -31,7 +31,7 @@
                     <td>
                         <form action="stock" method="post">
                             {% csrf_token %}
-                            <a class="button is-info is-small" href="?vt=edit&id={{ x.id }}">Edit</a>
+                            <a class="button is-info is-small" href="?vt=buy_or_sell&id={{ x.id }}">Buy/Sell</a>
                             <a class="button is-link is-small" href="?vt=detail&id={{ x.id }}">Detail</a>
                             <input type="hidden" name="_method" value="delete" />
                             <input name="id" type="hidden" value="{{ x.id }}"/>

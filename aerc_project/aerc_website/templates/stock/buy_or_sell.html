@@ -4,19 +4,27 @@
     <div class="container">
         <h2 class="title is-2">Stock Management</h2>
         <p class="subtitle is-4">
-            {% if id > 0 %}
-            Edit your stock
-            {% else %}
-            Add your new stock
-            {% endif %}
+            Buy/Sell your stock for {{ data.ticker_symbol }}.
         </p>
         <form action="stock" method="post">
             {% csrf_token %}
-            <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
+            <input name="id" type="hidden" value="{{ data.id }}">
+            <input name="_method" type="hidden" value="buy_or_sell">
             <div class="field">
-                <label class="label">Share Change</label>
+                <label class="label">Buy/Sell</label>
                 <div class="control">
-                    <input class="input" name="share_change" placeholder="Share of your stock" type="number"
+                    <div class="select">
+                        <select name="buy_sell">
+                            <option value="buy">Buy</option>
+                            <option value="sell">Sell</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Share (You currently have {{data.share}} shares.)</label>
+                <div class="control">
+                    <input class="input" name="share" placeholder="Share of your stock" type="number"
                             value="">
                 </div>
             </div>

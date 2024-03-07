@@ -182,40 +182,52 @@ class Stock(models.Model):
     
     def __str__(self):
         return f"{self.ticker_symbol} ({self.market})"
+    
+    def current_value(self):
+        return self.share * self.purchase_price
+    
+    def update_on_transaction(self, transaction):
+        if transaction.share > 0:
+            total_purchase_price = (self.share * self.purchase_price) + (transaction.share * transaction.purchase_price)
+            total_share = self.share + transaction.share
+            self.purchase_price = total_purchase_price / total_share
+            self.share = total_share
+        else:
+            self.share += transaction.share
+        self.purchase_date = transaction.purchase_date
+        self.save()
 
-@receiver(pre_save, sender=Stock)
-def encrypt_stock(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        instance.checksum = hasher.hash(instance.ticker_symbol, instance.market, instance.currency)
-        instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
-        instance.market = cipher.encrypt(instance.market)
-        instance.currency = cipher.encrypt(instance.currency)
+# @receiver(pre_save, sender=Stock)
+# def encrypt_stock(sender, instance, **kwargs):
+#     if instance.id is None:
+#         pass
+#     else:
+#         instance.checksum = hasher.hash(instance.ticker_symbol, instance.market, instance.currency)
+#         instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
+#         instance.market = cipher.encrypt(instance.market)
+#         instance.currency = cipher.encrypt(instance.currency)
 
-@receiver(post_init, sender=Stock)
-def decrypt_stock(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        try:
-            instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
-            instance.market = cipher.decrypt(instance.market)
-            instance.currency = cipher.decrypt(instance.currency)
-            instance.checksumOk = hasher.verify(instance.checksum, instance.ticker_symbol, instance.market, instance.currency)
-        except:
-            print("decrypt_stock except")
+# @receiver(post_init, sender=Stock)
+# def decrypt_stock(sender, instance, **kwargs):
+#     if instance.id is None:
+#         pass
+#     else:
+#         try:
+#             instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
+#             instance.market = cipher.decrypt(instance.market)
+#             instance.currency = cipher.decrypt(instance.currency)
+#             instance.checksumOk = hasher.verify(instance.checksum, instance.ticker_symbol, instance.market, instance.currency)
+#         except:
+#             print("decrypt_stock except")
 
 class StockTransaction(models.Model):
-    ticker_symbol = models.ForeignKey(Stock, on_delete=models.CASCADE)
-    transaction_date = models.DateTimeField()
+    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
     share = models.IntegerField(default=0)
-    price = models.FloatField()
     purchase_date = models.DateField(null=True)
     purchase_price = models.FloatField(null=True)
 
     class Meta:
-        ordering = ["transaction_date"]
+        ordering = ["purchase_date"]
         verbose_name = "Stock Transaction"
         verbose_name_plural = "Stock Transactions"
 

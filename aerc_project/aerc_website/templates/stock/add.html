@@ -4,11 +4,7 @@
     <div class="container">
         <h2 class="title is-2">Stock Management</h2>
         <p class="subtitle is-4">
-            {% if id > 0 %}
-            Edit your stock
-            {% else %}
             Add your new stock
-            {% endif %}
         </p>
         <form action="stock" method="post">
             {% csrf_token %}

@@ -6,7 +6,10 @@
         <p class="subtitle is-4">
             {{ data.ticker_symbol }}
         </p>
+    </div>
+    <div class="stock-info">
         <div class="container">
+            <h3 class="title is-3">Stock Information</h3>
             <table class="table is-striped is-hoverable is-fullwidth">
                 <table class="table is-striped is-hoverable is-fullwidth">
                     <tbody>
@@ -46,6 +49,38 @@
                 </table>
             </table>
         </div>
+        <div class="container">
+            <a href="{% url 'stock' %}?vt=buy_or_sell&id={{ data.id }}" class="button is-primary">Buy or Sell</a>
+        </div>
+        <div class="container">
+            <h3 class="title is-3">Stock Transactions</h3>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Transaction Date</th>
+                        <th>Transaction Type</th>
+                        <th>Share</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ transaction.purchase_date|date:'Y-m-d' }}</td>
+                        {% if transaction.share > 0 %}
+                        <td class="has-text-success">Buy</td>
+                        {% else %}
+                        <td class="has-text-danger">Sell</td>
+                        {% endif %}
+                        <td>{{ transaction.share }}</td>
+                        <td>{{ transaction.purchase_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>  
         <div class="stock-info-graph">
             <div class="container">
                 <div class="columns is-vcentered is-centered">
