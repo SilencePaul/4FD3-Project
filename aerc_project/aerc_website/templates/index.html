@@ -50,8 +50,23 @@
                     <div class="card-content">
                         <p class="title">Stock</p>
                         <p class="subtitle">
-                            {% if stock %}
-                                {{ stock }}
+                            {% if stocks %}
+                            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stock in stocks %}
+                                        <tr>
+                                            <td>{{ stock.ticker_symbol }}</td>
+                                            <td>{{ stock.purchase_price }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                             {% else %}
                                 No stock information
                             {% endif %}

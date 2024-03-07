@@ -17,6 +17,7 @@ class VIEWTYPE(Enum):
     list = auto()
     detail = auto()
     edit = auto()
+    add = auto()
 
 # Create your views here.
 
@@ -47,19 +48,12 @@ def index(request):
     if cache.get(IS_LOGGED, False) is not True:
         return redirect('login')
     context = {}
-    if request.method == "POST":
-        stock = request.POST.get('stock', None)
-        crypto = request.POST.get('crypto', None)
-        vehicle = request.POST.get('vehicle', None)
-        house = request.POST.get('house', None)
+    context['stocks'] = Stock.objects.all()
+    context['crypto'] = None
+    context['vehicle'] = None
+    context['house'] = None
+    return render(request, 'index.html', context)
 
-        context['stock'] = stock
-        context['crypto'] = crypto
-        context['vehicle'] = vehicle
-        context['house'] = house
-        return render(request, 'index.html', context)
-    else:
-        return render(request, 'index.html')
 
 def vehicle(request):
     if cache.get(IS_LOGGED, False) is not True:
@@ -297,7 +291,7 @@ def stock(request):
             context['page'] = page
             context['data'] = data
             context['hasPrev'] = page > 1
-            context['hasNext'] = page * size + len(data) != total
+            context['hasNext'] = (page * size) < total
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'stock/index.html', context)
@@ -306,7 +300,7 @@ def stock(request):
             context['id'] = id
             if id > 0:
                 context['data'] = Stock.objects.get(id=id)
-            return render(request, 'stock/add.html', context)
+            return render(request, 'stock/edit.html', context)
         elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
             id = int(request.GET.get('id', 0))
             context['id'] = id

@@ -207,10 +207,12 @@ def decrypt_stock(sender, instance, **kwargs):
             print("decrypt_stock except")
 
 class StockTransaction(models.Model):
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    ticker_symbol = models.ForeignKey(Stock, on_delete=models.CASCADE)
     transaction_date = models.DateTimeField()
     share = models.IntegerField(default=0)
     price = models.FloatField()
+    purchase_date = models.DateField(null=True)
+    purchase_price = models.FloatField(null=True)
 
     class Meta:
         ordering = ["transaction_date"]
