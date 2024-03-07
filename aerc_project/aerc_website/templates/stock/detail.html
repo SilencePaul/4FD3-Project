@@ -31,7 +31,7 @@
                         </tr>
                         <tr>
                             <td>Purchase Price</td>
-                            <td>{{ data.purchase_price }}</td>
+                            <td>{{ data.purchase_price|floatformat:2 }}</td>
                         </tr>
                         <tr>
                             <td>Purchase Date</td>
@@ -40,9 +40,9 @@
                         <tr>
                             <td>Total Return</td>
                             {% if total_return > 0 %}
-                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return }}</td>
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return|floatformat:2 }}</td>
                             {% else %}
-                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return }}</td>
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return|floatformat:2 }}</td>
                             {% endif %}
                         </tr>
                     </tbody>

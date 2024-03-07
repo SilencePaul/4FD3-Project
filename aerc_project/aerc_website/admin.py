@@ -15,4 +15,11 @@ admin.site.register(Stock)
 admin.site.register(Crypto)
 admin.site.register(House)
 admin.site.register(HousingIndex)
-admin.site.register(StockTransaction)
+
+@admin.register(StockTransaction)
+class StockTransactionAdmin(admin.ModelAdmin):
+    list_display = ('stock', 'share', 'purchase_price', 'purchase_date')
+    list_filter = ('stock', 'share', 'purchase_price', 'purchase_date')
+    search_fields = ('stock', 'share', 'purchase_price', 'purchase_date')
+    ordering = ('stock', 'share', 'purchase_price', 'purchase_date')
+    list_per_page = 25

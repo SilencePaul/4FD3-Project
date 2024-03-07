@@ -398,12 +398,13 @@ def stock(request):
             Stock.objects.get(id=id).delete()
         elif _method == "buy_or_sell":
             buy_or_sell = request.POST.get('buy_or_sell', "")
-            share = int(request.POST.get('share', 0))
             purchase_price = float(request.POST.get('purchase_price', ""))
             purchase_date = request.POST.get('purchase_date', "")
             stock = Stock.objects.get(id=id)
             if buy_or_sell == "sell":
-                share = -share
+                share = -int(request.POST.get('share', 0))
+            else:
+                share = int(request.POST.get('share', 0))
             transaction = StockTransaction(
                 stock=stock,
                 share=share,
