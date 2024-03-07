@@ -17,8 +17,8 @@
                     {% for info in data %}
                         <tr>
                             <td>{{ info.category }}</td>
-                            <td>{{ info.current_value }}</td>
-                            <td> </td> {#Add Current Value here#}
+                            <td>{{ info.purchase_price|floatformat:2 }}</td>
+                            <td>{{ info.current_value|floatformat:2 }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
