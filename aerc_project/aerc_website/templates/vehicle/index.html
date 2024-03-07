@@ -16,7 +16,7 @@
                         <td>Purchase Price</td>
                         <td>Purchase Date</td>
                         <td>
-                            <a class="button is-primary is-small" href="?vt=detail">Add</a>
+                            <a class="button is-primary is-small" href="?vt=edit">Add</a>
                         </td>
                     </tr>
                     </thead>
@@ -32,7 +32,9 @@
                         <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                         <td>
                             <form action="vehicle" method="post">
-                                <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
+                                {% csrf_token %}
+                                <a class="button is-info is-small" href="?vt=edit&id={{ x.id }}">Edit</a>
+                                <a class="button is-link is-small" href="?vt=detail&id={{ x.id }}">Detail</a>
                                 <input type="hidden" name="_method" value="delete" />
                                 <input name="id" type="hidden" value="{{ x.id }}"/>
                                 <input type="submit" value="Delete" class="button is-danger is-small" />
