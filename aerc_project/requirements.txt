@@ -7,3 +7,5 @@ pytz==2024.1
 sqlparse==0.4.4
 typing_extensions==4.9.0
 requests==2.31.0
+django-apscheduler==0.6.2
+django-extensions==3.2.3

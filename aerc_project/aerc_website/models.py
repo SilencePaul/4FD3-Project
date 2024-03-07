@@ -116,7 +116,8 @@ def decrypt_user(sender, instance, **kwargs):
 class Asset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(choices=AssetType.CHOICES, max_length=1, default='O')
-    current_value = models.FloatField()
+    purchase_price = models.FloatField(default=0)
+    current_value = models.FloatField(default=0)
 
 class Vehicle(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)

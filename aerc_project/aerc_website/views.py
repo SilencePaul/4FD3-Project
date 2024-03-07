@@ -10,6 +10,9 @@ import urllib, base64
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.core.cache import cache
 from datetime import timedelta
+from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_cryptos_value, get_stocks_value
+
+setup_schedule()
 
 IS_LOGGED = "isLogged"
 
@@ -115,7 +118,7 @@ def vehicle(request):
             a.save()
         # update asset
         targets = Vehicle.objects.all()
-        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.save()
         return redirect('vehicle')
 
@@ -210,7 +213,7 @@ def house(request):
             a.save()
         # update asset
         targets = House.objects.all()
-        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.save()
         return redirect('house')
 
@@ -262,7 +265,7 @@ def crypto(request):
             a.save()
         # update asset
         targets = Crypto.objects.all()
-        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.save()
         return redirect('crypto')
 
@@ -379,7 +382,7 @@ def stock(request):
             a.save()
         # update asset
         targets = Stock.objects.all()
-        asset.current_value = sum([x.purchase_price for x in targets])
+        asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.save()
         return redirect('stock')
 

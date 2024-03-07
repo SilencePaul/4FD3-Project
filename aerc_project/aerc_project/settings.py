@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "aerc_website",
-    "django_extensions"
+    "django_extensions",
+    "django_apscheduler"
 ]
 
 MIDDLEWARE = [

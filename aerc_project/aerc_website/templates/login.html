@@ -7,9 +7,9 @@
         <form action="/login" method="POST">
             {% csrf_token %}
             <div class="field">
-                <label class="label">Password:</label>
+                <label class="label" for="password">Password:</label>
                 <div class="control">
-                    <input class="input {% if msg %}is-danger{% endif %}" type="text" name="password" placeholder="Please enter a password">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="password" id="password" name="password" placeholder="Please enter a password">
                 </div>
                 <p class="help is-danger">{{msg}}</p>
             </div>
