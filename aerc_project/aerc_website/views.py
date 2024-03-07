@@ -119,7 +119,7 @@ def vehicle(request):
                     depreciated_prices.append(depreciated_value)
                 context['current_price'] = round(depreciated_prices[-1],2)
                 context['total_return'] = depreciated_prices[-1] - vehicle_data.purchase_price
-                context['ytd_return'] = round((depreciated_prices[-1] - vehicle_data.purchase_price)/vehicle_data.purchase_price/(months_difference/12)*100,2)
+                context['annual_return'] = round((depreciated_prices[-1] - vehicle_data.purchase_price)/vehicle_data.purchase_price/(months_difference/12)*100,2)
                 # Generate the Plot for html
                 matplotlib.use('Agg')
                 fig, ax = plt.subplots()
@@ -209,7 +209,9 @@ def house(request):
                 prices = [p['value'] for p in house_data.price_history]
                 context['current_price'] = round(prices[0],2)
                 owned_years = datetime.now().year - house_data.purchase_date.year
-                context['ytd_return'] = round((prices[0] - house_data.purchase_price)/house_data.purchase_price/owned_years*100,2)
+                context['annual_return'] = round((prices[0] - house_data.purchase_price)/house_data.purchase_price/owned_years*100,2)
+                print(prices[0]-prices[datetime.now().month])
+                context['ytd'] = round((prices[0] - prices[datetime.now().month]),2)
                 # Generate the Plot for html
                 matplotlib.use('Agg')
                 fig, ax = plt.subplots()
