@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
-from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory
+from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType
 from enum import Enum, auto
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -139,11 +139,11 @@ def house(request):
             return render(request, 'house/index.html', context)
         elif VIEWTYPE[viewtype] is VIEWTYPE.edit:
             id = int(request.GET.get('id', 0))
+            context['locations'] = LocationCategory.CHOICES
+            context['proporty_types'] = PropertyType.CHOICES
             context['id'] = id
             if id > 0:
                 context['data'] = House.objects.get(id=id)
-                context['locations'] = LocationCategory.objects.all()
-                print(context['locations'])
             return render(request, 'house/edit.html', context)
         elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
             id = int(request.GET.get('id', 0))
@@ -151,8 +151,7 @@ def house(request):
             if id > 0:
                 house_data = House.objects.get(id=id)
                 context['data'] = house_data
-                context['total_return'] = house_data.price_history[-1]['value'] - house_data.purchase_price
-
+                context['total_return'] = house_data.price_history[0]['value'] - house_data.purchase_price
                 # Generate the Plot for html
                 months = [p['month'].date() for p in house_data.price_history]
                 prices = [p['value'] for p in house_data.price_history]
@@ -181,6 +180,7 @@ def house(request):
         else:
             property_type = request.POST.get('property_type', "")
             address = request.POST.get('address', "")
+            location = request.POST.get('location', "")
             street_number = request.POST.get('street_number', "")
             postal_code = request.POST.get('postal_code', "")
             lot_width = float(request.POST.get('lot_width', 0))
@@ -196,6 +196,7 @@ def house(request):
                 address=address,
                 street_number=street_number,
                 postal_code=postal_code,
+                location=location,
                 lot_width=lot_width,
                 lot_depth=lot_depth,
                 bedroom=bedroom,
