@@ -26,7 +26,7 @@
                     <td>{{ x.ticker_symbol }}</td>
                     <td>{{ x.market }}</td>
                     <td>{{ x.currency }}</td>
-                    <td>{{ x.purchase_price }}</td>
+                    <td>{{ x.purchase_price|floatformat:2 }}</td>
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                     <td>
                         <form action="stock" method="post">
