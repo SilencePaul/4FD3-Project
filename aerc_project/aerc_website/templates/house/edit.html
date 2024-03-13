@@ -51,25 +51,21 @@
       <div class="field">
         <label class="label">Location</label>
         <div class="control">
-          <input
-            class="input"
-            name="property_type"
-            placeholder="city/province of your house"
-            type="option"
-            value="{{data.location}}"
-          />
+          <select class="input" name="location">
+            {% for location in locations %}
+            <option value="{{location.0}}" {% if data.location == location.0 %}selected="selected"{% endif %}>{{ location.1 }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
       <div class="field">
         <label class="label">Property Type</label>
         <div class="control">
-          <input
-            class="input"
-            name="property_type"
-            placeholder="Property type of your house"
-            type="text"
-            value="{{data.property_type}}"
-          />
+          <select class="input" name="property_type">
+            {% for proporty_type in proporty_types %}
+            <option value="{{proporty_type.0}}" {% if data.property_type == proporty_type.0 %}selected="selected"{% endif %}>{{ proporty_type.1 }}</option>
+            {% endfor %}
+          </select>
         </div>
       </div>
       <div class="field">
