@@ -21,7 +21,7 @@
                 <tbody>
                 {% for x in data %}
                 <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
-                    <td>{{ x.property_type }}</td>
+                    <td>{{ x.get_property_type_display }}</td>
                     <td>{{ x }}</td>
                     <td>{{ x.purchase_price }}</td>
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
