@@ -252,30 +252,6 @@ class Stock(models.Model):
         self.save()
 
 
-# @receiver(pre_save, sender=Stock)
-# def encrypt_stock(sender, instance, **kwargs):
-#     if instance.id is None:
-#         pass
-#     else:
-#         instance.checksum = hasher.hash(instance.ticker_symbol, instance.market, instance.currency)
-#         instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
-#         instance.market = cipher.encrypt(instance.market)
-#         instance.currency = cipher.encrypt(instance.currency)
-
-# @receiver(post_init, sender=Stock)
-# def decrypt_stock(sender, instance, **kwargs):
-#     if instance.id is None:
-#         pass
-#     else:
-#         try:
-#             instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
-#             instance.market = cipher.decrypt(instance.market)
-#             instance.currency = cipher.decrypt(instance.currency)
-#             instance.checksumOk = hasher.verify(instance.checksum, instance.ticker_symbol, instance.market, instance.currency)
-#         except:
-#             print("decrypt_stock except")
-
-
 class StockTransaction(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
     share = models.IntegerField(default=0)
@@ -293,33 +269,51 @@ class StockTransaction(models.Model):
 
 class Crypto(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
-    coin_name = models.CharField(max_length=10, default="")
-    amount = models.IntegerField(default=0)
+    ticker_symbol = models.CharField(max_length=20, default="", db_index=True)
+    name = models.CharField(max_length=256, default="")
+    share = models.PositiveIntegerField(default=0)
+    currency = models.CharField(max_length=3, default="")
     purchase_price = models.FloatField(default=0)
-    purchase_date = models.DateTimeField(auto_now_add=True)
+    purchase_date = models.DateField()
     checksum = models.CharField("checksum", max_length=255, blank=True)
     checksumOk = False
 
+    class Meta:
+        ordering = ["ticker_symbol"]
+        verbose_name = "Crypto"
+        verbose_name_plural = "Cryptos"
 
-@receiver(pre_save, sender=Crypto)
-def encrypt_crypto(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        instance.checksum = hasher.hash(instance.coin_name)
-        instance.coin_name = cipher.encrypt(instance.coin_name)
+    def __str__(self):
+        return f"{self.ticker_symbol} {self.name}"
+    
+    def current_value(self):
+        return self.share * self.purchase_price
+    
+    def update_on_transaction(self, transaction):
+        if transaction.share > 0:
+            total_purchase_price = (self.share * self.purchase_price) + (transaction.share * transaction.purchase_price)
+            total_share = self.share + transaction.share
+            self.purchase_price = total_purchase_price / total_share
+            self.share = total_share
+        else:
+            self.share += transaction.share
+        self.purchase_date = transaction.purchase_date
+        self.save()
 
 
-@receiver(post_init, sender=Crypto)
-def decrypt_crypto(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        try:
-            instance.coin_name = cipher.decrypt(instance.coin_name)
-            instance.checksumOk = hasher.verify(instance.checksum, instance.coin_name)
-        except:
-            print("decrypt_crypto except")
+class CryptoTransaction(models.Model):
+    crypto = models.ForeignKey(Crypto, on_delete=models.CASCADE)
+    share = models.IntegerField(default=0)
+    purchase_date = models.DateField(null=True)
+    purchase_price = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ["purchase_date"]
+        verbose_name = "Crypto Transaction"
+        verbose_name_plural = "Crypto Transactions"
+    
+    def __str__(self):
+        return f"{self.crypto.ticker_symbol} {self.crypto.name}"
 
 
 class House(models.Model):

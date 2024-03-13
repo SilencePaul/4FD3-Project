@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
-from .models import StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType
+from .models import CryptoTransaction, StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType
 from enum import Enum, auto
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -213,57 +213,6 @@ def house(request):
         asset.save()
         return redirect('house')
 
-def crypto(request):
-    if cache.get(IS_LOGGED, False) is not True:
-        return redirect('login')
-    context = {}
-    if request.method == "GET":
-        viewtype = request.GET.get('vt', 'list')
-        if VIEWTYPE[viewtype] is VIEWTYPE.list:
-            total = Crypto.objects.count()
-            size = int(request.GET.get('size', 20))
-            page = int(request.GET.get('page', 1))
-            data = Crypto.objects.all()[(page-1)*size:page*size]
-            context['total'] = total
-            context['size'] = size
-            context['page'] = page
-            context['data'] = data
-            context['hasPrev'] = page > 1
-            context['hasNext'] = page * size + len(data) != total
-            context['pagePrev'] = page - 1
-            context['pageNext'] = page + 1
-            return render(request, 'crypto/index.html', context)
-        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
-            id = int(request.GET.get('id', 0))
-            context['id'] = id
-            if id > 0:
-                context['data'] = Crypto.objects.get(id=id)
-            return render(request, 'crypto/detail.html', context)
-    if request.method == "POST":
-        id = int(request.POST.get('id', 0))
-        _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='C')
-        if _method == "delete":
-            Crypto.objects.get(id=id).delete()
-        else:
-            coin_name = request.POST.get('coin_name', "")
-            amount = int(request.POST.get('amount', 0))
-            purchase_price = request.POST.get('purchase_price', "")
-            purchase_date = request.POST.get('purchase_date', "")
-            a = Crypto(
-                asset_id=asset.id,
-                coin_name=coin_name,
-                amount=amount,
-                purchase_price=purchase_price,
-                purchase_date=purchase_date)
-            if id > 0:
-                a.id = id
-            a.save()
-        # update asset
-        targets = Crypto.objects.all()
-        asset.purchase_price = sum([x.purchase_price for x in targets])
-        asset.save()
-        return redirect('crypto')
 
 def stock(request):
     if cache.get(IS_LOGGED, False) is not True:
@@ -338,7 +287,7 @@ def stock(request):
                 data = response.json()
 
                 # Generate the Plot for html
-                dates = [datetime.utcfromtimestamp(item['t'] / 1000).date() for item in data['results']]
+                dates = [datetime.fromtimestamp(item['t'] / 1000).date() for item in data['results']]
                 closing_prices = [item['c'] for item in data['results']]
 
                 matplotlib.use('Agg')
@@ -481,6 +430,223 @@ def stock_search(request, stock_ticker):
         context["result_count"] = result_count
         context["result_list"] = result_list
         return render(request, '_stock_verify.html', context)
+
+
+def crypto(request):
+    if cache.get(IS_LOGGED, False) is not True:
+        return redirect('login')
+    context = {}
+    ticker = request.GET.get('ticker', None)
+    apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
+    if ticker:
+        params = {
+            "apiKey": apikey,
+            "ticker": ticker,
+        }
+        response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
+        response_json = response.json()
+        results = response_json["results"][0]
+
+        context['ticker'] = results["ticker"]
+        context['name'] = results["name"]
+        context['currency'] = results["currency_name"].upper()
+    if request.method == "GET":
+        viewtype = request.GET.get('vt', 'list')
+        if VIEWTYPE[viewtype] is VIEWTYPE.list:
+            total = Crypto.objects.count()
+            size = int(request.GET.get('size', 20))
+            page = int(request.GET.get('page', 1))
+            data = Crypto.objects.all()[(page-1)*size:page*size]
+            context['total'] = total
+            context['size'] = size
+            context['page'] = page
+            context['data'] = data
+            context['hasPrev'] = page > 1
+            context['hasNext'] = (page * size) < total
+            context['pagePrev'] = page - 1
+            context['pageNext'] = page + 1
+            return render(request, 'crypto/index.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.buy_or_sell:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                context['data'] = Crypto.objects.get(id=id)
+            return render(request, 'crypto/buy_or_sell.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.add:
+            if ticker:
+                return render(request, 'crypto/add.html', context)
+            else:
+                return render(request, 'crypto/new_crypto.html')
+        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                crypto_data = Crypto.objects.get(id=id)
+                context['data'] = crypto_data
+
+                transactions = CryptoTransaction.objects.filter(crypto=crypto_data).order_by('purchase_date')
+                context['transactions'] = transactions
+
+                initial_transaction = transactions[0]
+
+                base_url = 'https://api.polygon.io/v2/aggs/ticker/'
+                ticker = crypto_data.ticker_symbol
+                date_from = initial_transaction.purchase_date
+                date_to = datetime.now().date()
+                purchase_price = crypto_data.purchase_price
+
+                # Get the stock data
+                url = f"{base_url}{ticker}/range/1/day/{date_from}/{date_to}"
+                params = {
+                    'apiKey': apikey,
+                }
+                response = requests.get(url, params=params)
+                data = response.json()
+                # Generate the Plot for html
+                dates = [datetime.fromtimestamp(item['t'] / 1000).date() for item in data['results']]
+                closing_prices = [item['c'] for item in data['results']]
+                matplotlib.use('Agg')
+                fig, ax = plt.subplots()
+                ax.plot(dates, closing_prices, label=ticker)
+
+                label_added = False
+                start = 1
+                for transaction in transactions:
+                    if not label_added:
+                        ax.plot(transaction.purchase_date, transaction.purchase_price, 'go', label='Transaction')
+                        label_added = True
+                        ax.annotate(
+                            f'{start}',
+                            (transaction.purchase_date, transaction.purchase_price),
+                            textcoords='offset points',
+                            xytext=(0, 5),
+                            ha='center')
+                        start += 1
+                    else:
+                        ax.plot(transaction.purchase_date, transaction.purchase_price, 'go')
+                        ax.annotate(
+                            f'{start}',
+                            (transaction.purchase_date, transaction.purchase_price),
+                            textcoords='offset points',
+                            xytext=(0, 5),
+                            ha='center')
+                        start += 1
+                
+                ax.axhline(y=purchase_price, color='r', linestyle='--', label='Purchase Price')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Price')
+                ax.set_title(f'{ticker} Crypto Price')
+                plt.xticks(rotation=45)
+                plt.tight_layout()
+                ax.legend()
+                img = io.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                plot_url = base64.b64encode(img.getvalue()).decode()
+                context['plot_url'] = f'data:image/png;base64,{plot_url}'
+
+                current_price = closing_prices[-1]
+                total_cost = 0
+                shares_owned = 0
+                for transaction in transactions:
+                    total_cost += transaction.share * transaction.purchase_price
+                    shares_owned += transaction.share
+                total_return = shares_owned * current_price - total_cost
+                context['total_return'] = total_return
+
+                return render(request, 'crypto/detail.html', context)
+    if request.method == "POST":
+        id = int(request.POST.get('id', 0))
+        _method = request.POST.get('_method', None)
+        asset = Asset.objects.get(category='C')
+        if _method == "delete":
+            Crypto.objects.get(id=id).delete()
+        elif _method == "buy_or_sell":
+            buy_or_sell = request.POST.get('buy_or_sell', "")
+            purchase_price = float(request.POST.get('purchase_price', ""))
+            purchase_date = request.POST.get('purchase_date', "")
+            crypto = Crypto.objects.get(id=id)
+            if buy_or_sell == "sell":
+                share = -int(request.POST.get('share', 0))
+            else:
+                share = int(request.POST.get('share', 0))
+            transaction = CryptoTransaction(
+                crypto=crypto,
+                share=share,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date)
+            transaction.save()
+            crypto.update_on_transaction(transaction)
+            crypto.save()
+        else:
+            share = int(request.POST.get('share', 0))
+            ticker_symbol = request.POST.get('ticker_symbol', "")
+            name = request.POST.get('name', "")
+            currency = request.POST.get('currency', "")
+            purchase_price = request.POST.get('purchase_price', "")
+            purchase_date = request.POST.get('purchase_date', "")
+            crypto = Crypto(
+                asset_id=asset.id,
+                share=share,
+                ticker_symbol=ticker_symbol,
+                name=name,
+                currency=currency,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date)
+            crypto.save()
+            initial_transaction = CryptoTransaction(
+                crypto=crypto,
+                share=share,
+                purchase_price=purchase_price,
+                purchase_date=purchase_date)
+            initial_transaction.save()
+        # update asset
+        targets = Crypto.objects.all()
+        asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.save()
+        return redirect('crypto')
+
+
+def crypto_search(request, crypto_ticker):
+    context = {}
+    if request.method == "GET":
+        crypto = Crypto.objects.filter(ticker_symbol=crypto_ticker)
+        if crypto:
+            context["crypto"] = crypto[0]
+            render(request, '_crypto_verify.html', context)
+        else:
+            context["crypto"] = None
+        crypto_ticker = crypto_ticker.upper()
+        crypto_ticker = "X:" + crypto_ticker
+        params = {
+            "apiKey": "wW55pKJzExsThjPDizKdf8OAdDfkvLPW",
+            "market": "crypto",
+            "ticker": crypto_ticker,
+            "limit": 10
+        }
+        response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
+        response_json = response.json()
+        
+        response_json_results = response_json["results"]
+        result_count = len(response_json_results)
+        result_list = []
+        if result_count == 1:
+            result_list.append(response_json_results[0])
+        elif result_count == 0:
+            params = {
+                "apiKey": "wW55pKJzExsThjPDizKdf8OAdDfkvLPW",
+                "market": "crypto",
+                "search": crypto_ticker,
+                "limit": 10
+            }
+            response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
+            response_json = response.json()
+            response_json_results = response_json["results"]
+            for result in response_json_results:
+                result_list.append(result)
+        context["result_count"] = result_count
+        context["result_list"] = result_list
+        return render(request, '_crypto_verify.html', context)
 
 def user(request):
     if cache.get(IS_LOGGED, False) is not True:

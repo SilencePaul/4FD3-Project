@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Crypto Management</h2>
+        <p class="subtitle is-4">
+            Buy/Sell your crypto for {{ data.ticker_symbol }}.
+        </p>
+        <form action="crypto" method="post">
+            {% csrf_token %}
+            <input name="id" type="hidden" value="{{ data.id }}">
+            <input name="_method" type="hidden" value="buy_or_sell">
+            <div class="field">
+                <label class="label">Buy/Sell</label>
+                <div class="control">
+                    <div class="select">
+                        <select name="buy_or_sell">
+                            <option value="buy">Buy</option>
+                            <option value="sell">Sell</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Share (You currently have {{data.share}} shares.)</label>
+                <div class="control">
+                    <input class="input" name="share" placeholder="Share of your crypto" type="number"
+                            value="">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Ticker Symbol</label>
+                <div class="control">
+                    <input class="input" name="ticker_symbol" placeholder="Symbol of your crypto" type="text"
+                            value="{{data.ticker_symbol}}" readonly>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                    <input class="input" name="name" placeholder="Name of your crypto" type="text"
+                            value="{{data.name}}" readonly>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Currency</label>
+                <div class="control">
+                    <input class="input" name="currency" placeholder="Currency of your crypto" type="text"
+                            value="{{data.currency}}" readonly>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Purchase Price</label>
+                <div class="control">
+                    <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
+                            value="">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Purchase Date</label>
+                <div class="control">
+                    <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
+                            value="">
+                </div>
+            </div>
+            <div class="field is-grouped">
+                <div class="control">
+                    <input class="button is-link" type="submit" value="Save"/>
+                </div>
+                <div class="control">
+                    <a class="button is-link is-light" href="?vt=list">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

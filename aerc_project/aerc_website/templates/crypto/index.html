@@ -8,25 +8,31 @@
             <table class="table is-striped is-hoverable is-fullwidth">
                 <thead>
                 <tr>
-                    <td>Coin Name</td>
-                    <td>Amount</td>
+                    <td>Share</td>
+                    <td>Ticker Symbol</td>
+                    <td>Name</td>
+                    <td>Currency</td>
                     <td>Purchase Price</td>
                     <td>Purchase Date</td>
                     <td>
-                        <a class="button is-primary is-small" href="?vt=detail">Add</a>
+                        <a class="button is-primary is-small" href="?vt=add">Add</a>
                     </td>
                 </tr>
                 </thead>
                 <tbody>
                 {% for x in data %}
                 <tr {% if x.checksumOk == False %}style="background:#ffe08a4d"{% endif %}>
-                    <td>{{ x.coin_name }}</td>
-                    <td>{{ x.amount }}</td>
-                    <td>{{ x.purchase_price }}</td>
+                    <td>{{ x.share }}</td>
+                    <td>{{ x.ticker_symbol }}</td>
+                    <td>{{ x.name }}</td>
+                    <td>{{ x.currency }}</td>
+                    <td>{{ x.purchase_price|floatformat:2 }}</td>
                     <td>{{ x.purchase_date|date:'Y-m-d' }}</td>
                     <td>
                         <form action="crypto" method="post">
-                            <a class="button is-info is-small" href="?vt=detail&id={{ x.id }}">Edit</a>
+                            {% csrf_token %}
+                            <a class="button is-info is-small" href="?vt=buy_or_sell&id={{ x.id }}">Buy/Sell</a>
+                            <a class="button is-link is-small" href="?vt=detail&id={{ x.id }}">Detail</a>
                             <input type="hidden" name="_method" value="delete" />
                             <input name="id" type="hidden" value="{{ x.id }}"/>
                             <input type="submit" value="Delete" class="button is-danger is-small" />

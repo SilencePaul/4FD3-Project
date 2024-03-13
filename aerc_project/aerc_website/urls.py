@@ -30,4 +30,5 @@ urlpatterns = [
     path('user', views.user, name='user'),
     path('asset', views.asset, name='asset'),
     re_path(r'^stock_search/(?P<stock_ticker>[^/]+)/$', views.stock_search, name='stock-search'),
+    re_path(r'^crypto_search/(?P<crypto_ticker>[^/]+)/$', views.crypto_search, name='crypto-search'),
 ]

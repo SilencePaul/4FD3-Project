@@ -1,0 +1,64 @@
+{% if crypto %}
+    <p class="has-text-success">{{ crypto.ticker_symbol }} has been already added.</p>
+    <p class="has-text-success">You can edit the share from here.</p>
+    <a href="{% url 'crypto' %}?vt=buy_or_sell&id={{ crypto.id }}">
+        <button class="button is-success">
+            <i class="fa fa-plus"></i>Buy or Sell
+        </button>
+    </a>
+{% else %}
+{% if result_count == 1 %}
+    <p class="has-text-success">Crypto Ticker Verification Pass</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in result_list %}
+            <tr>
+                <td>{{ result.ticker }}</td>
+                <td>{{ result.name }}</td>
+                <td>
+                    <a href="{% url 'crypto' %}?vt=add&ticker={{ result.ticker }}">
+                        <button class="button is-success">
+                            <i class="fa fa-plus"></i>ADD
+                        </button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="has-text-danger">Crypto Ticker Verification Fail.</p>
+    <p class="has-text-danger">Here are some possible ticker and name matched.</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ticker</th>
+                <th>Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in result_list %}
+            <tr>
+                <td>{{ result.ticker }}</td>
+                <td>{{ result.name }}</td>
+                <td>
+                    <a href="{% url 'crypto' %}?vt=add&ticker={{ result.ticker }}">
+                        <button class="button is-success">
+                            <i class="fa fa-plus"></i>ADD
+                        </button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+{% endif %}

@@ -18,8 +18,10 @@
             <div class="column is-half">
                 <label class="label">Crypto info:</label>
                 <div class="control">
-                    <input class="input" type="text" name="crypto" placeholder="Please enter your crypto information">
+                    <input class="input" type="text" id="crypto_ticker" placeholder="Please enter your crypto information">
+                    <button class="button is-primary mt-1" id="crypto_verify" type="button">Verify</button>
                 </div>
+                <div id="crypto_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
             </div>
         </div>
         <div class="columns">
@@ -79,8 +81,23 @@
                     <div class="card-content">
                         <p class="title">Crypto</p>
                         <p class="subtitle">
-                            {% if crypto %}
-                                {{ crypto }}
+                            {% if stocks %}
+                            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Ticker</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for crypto in cryptos %}
+                                        <tr>
+                                            <td>{{ crypto.ticker_symbol }}</td>
+                                            <td>{{ crypto.purchase_price|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                             {% else %}
                                 No crypto information
                             {% endif %}

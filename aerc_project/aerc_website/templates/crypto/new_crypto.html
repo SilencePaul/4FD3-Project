@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Crypto Management</h2>
+        <p class="subtitle is-4">
+            Add your new crypto
+        </p>
+        <label class="label">Crypto Ticker:</label>
+        <div class="control">
+            <input class="input" type="text" id="crypto_ticker" placeholder="Please enter your crypto ticker symbol"></br>
+            <button class="button is-primary mt-1" id="crypto_verify"type="button">Verify</button>
+        </div>
+        <div id="crypto_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
+    </div>
+</section>
+{% endblock %}

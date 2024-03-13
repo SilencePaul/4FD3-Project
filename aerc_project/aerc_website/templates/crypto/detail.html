@@ -4,52 +4,96 @@
     <div class="container">
         <h2 class="title is-2">Crypto Management</h2>
         <p class="subtitle is-4">
-            {% if id > 0 %}
-            Edit your crypto
-            {% else %}
-            Add your new crypto
-            {% endif %}
+            {{ data.ticker_symbol }}
         </p>
-        <form action="crypto" method="post">
-            {% csrf_token %}
-            <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
-            <div class="field">
-                <label class="label">Coin Name</label>
-                <div class="control">
-                    <input class="input" name="coin_name" placeholder="Coin name of your crypto" type="text"
-                            value="{{data.coin_name}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Amount</label>
-                <div class="control">
-                    <input class="input" name="amount" placeholder="Amount of your crypto" type="number"
-                            value="{{data.amount}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Purchase Price</label>
-                <div class="control">
-                    <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
-                            value="{{data.purchase_price}}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Purchase Date</label>
-                <div class="control">
-                    <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
-                            value="{{data.purchase_date|date:'Y-m-d'}}">
-                </div>
-            </div>
-            <div class="field is-grouped">
-                <div class="control">
-                    <input class="button is-link" type="submit" value="Save"/>
-                </div>
-                <div class="control">
-                    <a class="button is-link is-light" href="?vt=list">Cancel</a>
-                </div>
-            </div>
-        </form>
     </div>
+    <div class="crypto-info">
+        <div class="container">
+            <h3 class="title is-3">Crypto Information</h3>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <table class="table is-striped is-hoverable is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <td>Share</td>
+                            <td>{{ data.share }}</td>
+                        </tr>
+                        <tr>
+                            <td>Ticker Symbol</td>
+                            <td>{{ data.ticker_symbol }}</td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td>{{ data.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Currency</td>
+                            <td>{{ data.currency }}</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Price</td>
+                            <td>{{ data.purchase_price|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Date</td>
+                            <td>{{ data.purchase_date|date:'Y-m-d' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Return</td>
+                            {% if total_return > 0 %}
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return|floatformat:2 }}</td>
+                            {% else %}
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return|floatformat:2 }}</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </table>
+        </div>
+        <div class="container">
+            <a href="{% url 'crypto' %}?vt=buy_or_sell&id={{ data.id }}" class="button is-primary">Buy or Sell</a>
+        </div>
+        <div class="container">
+            <h3 class="title is-3">Crypto Transactions</h3>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Transaction Date</th>
+                        <th>Transaction Type</th>
+                        <th>Share</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ transaction.purchase_date|date:'Y-m-d' }}</td>
+                        {% if transaction.share > 0 %}
+                        <td class="has-text-success">Buy</td>
+                        {% else %}
+                        <td class="has-text-danger">Sell</td>
+                        {% endif %}
+                        <td>{{ transaction.share }}</td>
+                        <td>{{ transaction.purchase_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>  
+        <div class="crypto-info-graph">
+            <div class="container">
+                <div class="columns is-vcentered is-centered">
+                    <div class="column is-half">
+                        <figure class="image">
+                            <img src={{plot_url}} alt="Graph Image">
+                        </figure>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+    
 </section>
 {% endblock %}
