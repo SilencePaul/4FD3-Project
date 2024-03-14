@@ -25,6 +25,7 @@ def get_cryptos_value(cryptos, default):
         base_url = 'https://api.polygon.io/v2/aggs/ticker/'
         for c in cryptos:
             ticker = c.ticker_symbol
+            share = c.share
             date_from = (datetime.now() - timedelta(days=1)).date()
             date_to = datetime.now().date()
 
@@ -38,7 +39,7 @@ def get_cryptos_value(cryptos, default):
             results = data["results"]
             last = len(results)-1
             res += results[last]['c']
-        return res
+        return res * share
     except:
         return default*0.9955
 
@@ -49,6 +50,7 @@ def get_stocks_value(stocks, default):
         base_url = 'https://api.polygon.io/v2/aggs/ticker/'
         for s in stocks:
             ticker = s.ticker_symbol
+            share = s.share
             date_from = (datetime.now() - timedelta(days=1)).date()
             date_to = datetime.now().date()
 
@@ -63,7 +65,7 @@ def get_stocks_value(stocks, default):
                 results = data["results"]
                 last = len(results)-1
                 res += results[last]['c']
-        return res
+        return res*share
     except:
         return default*0.9955
 
