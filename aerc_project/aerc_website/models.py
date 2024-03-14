@@ -16,6 +16,11 @@ from .sha_hash import DataHasher
 cipher = DataCipher(b"secret", b"123456")
 hasher = DataHasher()
 
+def Cipher():
+    return cipher
+
+def Hasher():
+    return hasher
 
 def profile_path(instance, filename):
     ext = filename.split(".")[-1]

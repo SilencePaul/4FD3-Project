@@ -32,7 +32,7 @@
                         </div>
                         <div class="navbar-menu" id="navMenu">
                             <div class="navbar-start">
-                                <a class="navbar-item" href="/home">
+                                <a class="navbar-item {% if request.path == '/home' or request.path == '/' %}is-active{% endif %}" href="/home">
                                     Home
                                 </a>
                                 <a class="navbar-item {% if request.path == '/user' %}is-active{% endif %}" href="/user">
@@ -56,6 +56,11 @@
                             </div>
                             <div class="navbar-end">
                                 {% if request.path != '/login' %}
+                                    {% if passcode %}
+                                        <div class="navbar-item">
+                                            <p>Passcode: {{passcode}}</p>
+                                        </div>
+                                    {% endif %}
                                     <div class="navbar-item">
                                         <div class="buttons">
                                           <a class="button is-danger is-outlined" href="/logout">

@@ -7,18 +7,25 @@
         <form action="/login" method="POST">
             {% csrf_token %}
             <div class="field">
+                <label class="label" for="username">Username:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="text" id="username" name="username" placeholder="Please enter your username">
+                </div>
+            </div>
+            <div class="field">
                 <label class="label" for="password">Password:</label>
                 <div class="control">
-                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="password" id="password" name="password" placeholder="Please enter a password">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="password" id="password" name="password" placeholder="Please enter your password">
                 </div>
-                <p class="help is-danger">{{msg}}</p>
             </div>
             <div class="field">
                 <div class="control">
                     <button class="button is-link" type="submit">Submit</button>
+                    <p class="help is-danger">{{msg}}</p>
                 </div>
             </div>
         </form>
+        <p>not registered yet?<a class="button is-ghost" style="vertical-align:baseline" href="/register">sign up</a></p>
     </div>
 </section>
 {% endblock %}

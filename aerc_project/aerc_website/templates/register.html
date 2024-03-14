@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Welcome to the Asset Management System</h2>
+        <p class="subtitle is-4">Registration</p>
+        <form action="/register" method="POST">
+            {% csrf_token %}
+            <div class="field">
+                <label class="label" for="firstname">First Name:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="text" id="firstname" name="firstname" placeholder="Please enter your first name">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="lastname">Last Name:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="text" id="lastname" name="lastname" placeholder="Please enter your last name">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="email">Email:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="email" id="email" name="email" placeholder="Please enter your email">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="username">Username:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msgUsername %}is-danger{% endif %}" type="text" id="username" name="username" placeholder="Please enter your username">
+                </div>
+                <p class="help is-danger">{{msgUsername}}</p>
+            </div>
+            <div class="field">
+                <label class="label" for="password">Password:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msg %}is-danger{% endif %}" type="password" id="password" name="password" placeholder="Please enter your password">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="passcode">Passcode:</label>
+                <div class="control">
+                    <input required autocomplete="on" class="input {% if msgPasscode %}is-danger{% endif %}" type="password" id="passcode" name="passcode" placeholder="Please enter admin passcode">
+                </div>
+                <p class="help is-danger">{{msgPasscode}}</p>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-link" type="submit">Submit</button>
+                </div>
+            </div>
+        </form>
+        <p>already registered?<a class="button is-ghost" style="vertical-align:baseline" href="/login">sign in</a></p>
+    </div>
+</section>
+{% endblock %}

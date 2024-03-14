@@ -7,7 +7,7 @@ def get_vehicles_value(vehicles, default):
     try:
         1/0
     except:
-        return default*0.999666
+        return default*0.9966
 
 def get_houses_value(houses, default):
     try:
@@ -16,7 +16,7 @@ def get_houses_value(houses, default):
             res += h.price_history[-1]['value']
         return res
     except:
-        return default*0.999666
+        return default*0.9966
 
 def get_cryptos_value(cryptos, default):
     try:
@@ -40,7 +40,7 @@ def get_cryptos_value(cryptos, default):
             res += results[last]['c']
         return res
     except:
-        return default*0.999555
+        return default*0.9955
 
 def get_stocks_value(stocks, default):
     try:
@@ -65,42 +65,48 @@ def get_stocks_value(stocks, default):
                 res += results[last]['c']
         return res
     except:
-        return default*0.999555
+        return default*0.9955
 
 def update_current_values():
-    asset_vehicle = Asset.objects.get(category='V')
-    asset_vehicle.current_value = get_vehicles_value(
-        Vehicle.objects.all(),
-        asset_vehicle.current_value
-    )
-    asset_vehicle.save()
+    users = User.objects.all()
+    for u in users:
+        if Asset.objects.filter(category='V', user__id=u.id).count() > 0:
+            asset_vehicle = Asset.objects.get(category='V', user__id=u.id)
+            asset_vehicle.current_value = get_vehicles_value(
+                Vehicle.objects.all(),
+                asset_vehicle.current_value
+            )
+            asset_vehicle.save()
 
-    asset_house = Asset.objects.get(category='R')
-    asset_house.current_value = get_houses_value(
-        House.objects.all(),
-        asset_house.current_value
-    )
-    asset_house.save()
+        if Asset.objects.filter(category='R', user__id=u.id).count() > 0:
+            asset_house = Asset.objects.get(category='R', user__id=u.id)
+            asset_house.current_value = get_houses_value(
+                House.objects.all(),
+                asset_house.current_value
+            )
+            asset_house.save()
 
-    asset_crypto = Asset.objects.get(category='C')
-    asset_crypto.current_value = get_cryptos_value(
-        Crypto.objects.all(),
-        asset_crypto.current_value
-    )
-    asset_crypto.save()
+        if Asset.objects.filter(category='C', user__id=u.id).count() > 0:
+            asset_crypto = Asset.objects.get(category='C', user__id=u.id)
+            asset_crypto.current_value = get_cryptos_value(
+                Crypto.objects.all(),
+                asset_crypto.current_value
+            )
+            asset_crypto.save()
 
-    asset_stock = Asset.objects.get(category='E')
-    asset_stock.current_value = get_stocks_value(
-        Stock.objects.all(),
-        asset_stock.current_value
-    )
-    asset_stock.save()
+        if Asset.objects.filter(category='E', user__id=u.id).count() > 0:
+            asset_stock = Asset.objects.get(category='E', user__id=u.id)
+            asset_stock.current_value = get_stocks_value(
+                Stock.objects.all(),
+                asset_stock.current_value
+            )
+            asset_stock.save()
 
 def setup_schedule():
     update_current_values()
     scheduler = BackgroundScheduler()
     try:
-        scheduler.add_job(update_current_values, 'interval', minutes=1,
+        scheduler.add_job(update_current_values, 'interval', hours=1,
                           id='update_current_values', replace_existing=True)
         scheduler.start()
     except Exception as e:

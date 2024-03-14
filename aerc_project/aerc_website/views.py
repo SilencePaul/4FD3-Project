@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
-from .models import CryptoTransaction, StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType
+from .models import CryptoTransaction, StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType, Cipher, Hasher
 from enum import Enum, auto
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -14,7 +14,7 @@ from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_
 
 setup_schedule()
 
-IS_LOGGED = "isLogged"
+USER_ID = "uid"
 
 class VIEWTYPE(Enum):
     list = auto()
@@ -25,51 +25,98 @@ class VIEWTYPE(Enum):
 
 # Create your views here.
 
+def register(request):
+    context = {}
+    if request.method == "POST":
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        passcode = request.POST.get('passcode', None)
+        email = request.POST.get('email', None)
+        firstname = request.POST.get('firstname', None)
+        lastname = request.POST.get('lastname', None)
+        admin = User.objects.get(username='admin')
+        if passcode == Hasher().hash(admin.checksum + datetime.now().strftime('%d/%m/%y')).encode('utf-8').hex()[:8]:
+            if User.objects.filter(username=username).count() > 0:
+                context['msgUsername'] = "Username invalid!"
+                return render(request, 'register.html', context)
+            newUser = User.objects.create_user(username, email, password, first_name=firstname, last_name=lastname)
+            newUser.save()
+            print(newUser)
+            return redirect('login')
+        else:
+            context['msgPasscode'] = "Passcode invalid!"
+            return render(request, 'register.html', context)
+    else:
+        return render(request, 'register.html')
+
 def login(request):
     context = {}
     if request.method == "POST":
-        if User.objects.get(username="admin").check_password(request.POST.get('password', None)):
-            cache.set(IS_LOGGED, True, 86400)
-            return redirect('index')
-        else:
-            context['msg'] = "Password is wrong!"
+        username = request.POST.get('username', None)
+        try:
+            user = User.objects.get(username=username)
+            if user.check_password(request.POST.get('password', None)):
+                cache.set(user.id, True, 86400)
+                res = redirect('index')
+                res.set_cookie(USER_ID, value=Cipher().encrypt(str(user.id)), max_age=86400)
+                return res
+            else:
+                context['msg'] = "Username/Password is wrong!"
+                return render(request, 'login.html', context)
+        except:
+            context['msg'] = "Username/Password is wrong!"
             return render(request, 'login.html', context)
     else:
         return render(request, 'login.html')
 
 def logout(request):
-    if cache.get(IS_LOGGED, False):
-        cache.delete(IS_LOGGED)
-    return redirect('login')
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    res = redirect('login')
+    if cache.get(uid, False):
+        cache.delete(uid)
+        res.delete_cookie(USER_ID)
+    return res
 
 def home(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+
+    if User.objects.filter(username='admin', id=uid).count() > 0:
+        admin = User.objects.get(username='admin', id=uid)
+        context['passcode'] = Hasher().hash(admin.checksum + datetime.now().strftime('%d/%m/%y')).encode('utf-8').hex()[:8]
     return render(request, 'index.html', context)
 
 def index(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
-    context['stocks'] = Stock.objects.all()
+    context['stocks'] = Stock.objects.filter(asset__user__id=uid).all()
     context['crypto'] = None
     context['vehicle'] = None
     context['house'] = None
+
+    if User.objects.filter(username='admin', id=uid).count() > 0:
+        admin = User.objects.get(username='admin', id=uid)
+        context['passcode'] = Hasher().hash(admin.checksum + datetime.now().strftime('%d/%m/%y')).encode('utf-8').hex()[:8]
     return render(request, 'index.html', context)
 
 
 def vehicle(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
-            total = Vehicle.objects.count()
+            query = Vehicle.objects.filter(asset__user__id=uid)
+            total = query.count()
             size = int(request.GET.get('size', 20))
             page = int(request.GET.get('page', 1))
-            data = Vehicle.objects.all()[(page-1)*size:page*size]
+            data = query.all()[(page-1)*size:page*size]
             context['total'] = total
             context['size'] = size
             context['page'] = page
@@ -88,7 +135,7 @@ def vehicle(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='V')
+        asset = Asset.objects.get(category='V', user__id=uid)
         if _method == "delete":
             Vehicle.objects.get(id=id).delete()
         else:
@@ -112,23 +159,25 @@ def vehicle(request):
                 a.id = id
             a.save()
         # update asset
-        targets = Vehicle.objects.all()
+        targets = Vehicle.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
         return redirect('vehicle')
 
 def house(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
-            total = House.objects.count()
+            query = House.objects.filter(asset__user__id=uid)
+            total = query.count()
             size = int(request.GET.get('size', 20))
             page = int(request.GET.get('page', 1))
-            data = House.objects.all()[(page-1)*size:page*size]
+            data = query.all()[(page-1)*size:page*size]
             context['total'] = total
             context['size'] = size
             context['page'] = page
@@ -175,7 +224,7 @@ def house(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='R')
+        asset = Asset.objects.get(category='R', user__id=uid)
         if _method == "delete":
             House.objects.get(id=id).delete()
         else:
@@ -209,7 +258,7 @@ def house(request):
                 a.id = id
             a.save()
         # update asset
-        targets = House.objects.all()
+        targets = House.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
@@ -217,7 +266,8 @@ def house(request):
 
 
 def stock(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
     ticker = request.GET.get('ticker', None)
@@ -238,10 +288,11 @@ def stock(request):
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
-            total = Stock.objects.count()
+            query = Stock.objects.filter(asset__user__id=uid)
+            total = query.count()
             size = int(request.GET.get('size', 20))
             page = int(request.GET.get('page', 1))
-            data = Stock.objects.all()[(page-1)*size:page*size]
+            data = query.all()[(page-1)*size:page*size]
             context['total'] = total
             context['size'] = size
             context['page'] = page
@@ -345,7 +396,7 @@ def stock(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='E')
+        asset = Asset.objects.get(category='E', user__id=uid)
         if _method == "delete":
             Stock.objects.get(id=id).delete()
         elif _method == "buy_or_sell":
@@ -388,7 +439,7 @@ def stock(request):
                 purchase_date=purchase_date)
             initial_transaction.save()
         # update asset
-        targets = Stock.objects.all()
+        targets = Stock.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
@@ -436,7 +487,8 @@ def stock_search(request, stock_ticker):
 
 
 def crypto(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
     ticker = request.GET.get('ticker', None)
@@ -456,10 +508,11 @@ def crypto(request):
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
-            total = Crypto.objects.count()
+            query = Crypto.objects.filter(asset__user__id=uid)
+            total = query.count()
             size = int(request.GET.get('size', 20))
             page = int(request.GET.get('page', 1))
-            data = Crypto.objects.all()[(page-1)*size:page*size]
+            data = query.all()[(page-1)*size:page*size]
             context['total'] = total
             context['size'] = size
             context['page'] = page
@@ -561,7 +614,7 @@ def crypto(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='C')
+        asset = Asset.objects.get(category='C', user__id=uid)
         if _method == "delete":
             Crypto.objects.get(id=id).delete()
         elif _method == "buy_or_sell":
@@ -604,7 +657,7 @@ def crypto(request):
                 purchase_date=purchase_date)
             initial_transaction.save()
         # update asset
-        targets = Crypto.objects.all()
+        targets = Crypto.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
@@ -653,7 +706,8 @@ def crypto_search(request, crypto_ticker):
         return render(request, '_crypto_verify.html', context)
 
 def user(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
     if request.method == "GET":
@@ -672,14 +726,16 @@ def user(request):
         return render(request, 'user/index.html', context)
 
 def asset(request):
-    if cache.get(IS_LOGGED, False) is not True:
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
     if request.method == "GET":
-        total = Asset.objects.count()
+        query = Asset.objects.filter(user__id=uid)
+        total = query.count()
         size = int(request.GET.get('size', 20))
         page = int(request.GET.get('page', 1))
-        data = Asset.objects.all()[(page-1)*size:page*size]
+        data = query.all()[(page-1)*size:page*size]
         for d in data:
             for c in AssetType.CHOICES:
                 if c[0] == str(d.category):
