@@ -114,6 +114,7 @@ def vehicle(request):
         # update asset
         targets = Vehicle.objects.all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.current_value = asset.purchase_price
         asset.save()
         return redirect('vehicle')
 
@@ -210,6 +211,7 @@ def house(request):
         # update asset
         targets = House.objects.all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.current_value = asset.purchase_price
         asset.save()
         return redirect('house')
 
@@ -388,6 +390,7 @@ def stock(request):
         # update asset
         targets = Stock.objects.all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.current_value = asset.purchase_price
         asset.save()
         return redirect('stock')
 
@@ -603,6 +606,7 @@ def crypto(request):
         # update asset
         targets = Crypto.objects.all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.current_value = asset.purchase_price
         asset.save()
         return redirect('crypto')
 
