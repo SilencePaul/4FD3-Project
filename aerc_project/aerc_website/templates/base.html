@@ -55,7 +55,7 @@
                                 </a>
                             </div>
                             <div class="navbar-end">
-                                {% if request.path != '/login' %}
+                                {% if request.path != '/login' and request.path != '/register' %}
                                     {% if passcode %}
                                         <div class="navbar-item">
                                             <p>Passcode: {{passcode}}</p>
