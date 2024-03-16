@@ -41,7 +41,10 @@ def register(request):
                 return render(request, 'register.html', context)
             newUser = User.objects.create_user(username, email, password, first_name=firstname, last_name=lastname)
             newUser.save()
-            print(newUser)
+            Asset(user=newUser, category="C").save()
+            Asset(user=newUser, category="E").save()
+            Asset(user=newUser, category="R").save()
+            Asset(user=newUser, category="V").save()
             return redirect('login')
         else:
             context['msgPasscode'] = "Passcode invalid!"

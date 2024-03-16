@@ -119,20 +119,17 @@ class User(AbstractUser):
 
 @receiver(pre_save, sender=User)
 def encrypt_user(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        instance.checksum = hasher.hash(
-            instance.username,
-            instance.email,
-            instance.first_name,
-            instance.last_name,
-            instance.gender,
-        )
-        instance.email = cipher.encrypt(instance.email)
-        instance.first_name = cipher.encrypt(instance.first_name)
-        instance.last_name = cipher.encrypt(instance.last_name)
-        instance.gender = cipher.encrypt(instance.gender)
+    instance.checksum = hasher.hash(
+        instance.username,
+        instance.email,
+        instance.first_name,
+        instance.last_name,
+        instance.gender,
+    )
+    instance.email = cipher.encrypt(instance.email)
+    instance.first_name = cipher.encrypt(instance.first_name)
+    instance.last_name = cipher.encrypt(instance.last_name)
+    instance.gender = cipher.encrypt(instance.gender)
 
 
 @receiver(post_init, sender=User)
@@ -163,13 +160,16 @@ class Asset(models.Model):
     purchase_price = models.FloatField(default=0)
     current_value = models.FloatField(default=0)
 
+    class Meta:
+        ordering = ['category']
+
 
 class Vehicle(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     year = models.SmallIntegerField(default=2000)
     color = models.CharField(max_length=20, default="")
     brand = models.CharField(max_length=20, default="")
-    VIN = models.CharField(max_length=30, unique=True, default="")
+    VIN = models.CharField(max_length=30, default="")
     model = models.CharField(max_length=20, default="")
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateField()
@@ -187,16 +187,13 @@ class Vehicle(models.Model):
 
 @receiver(pre_save, sender=Vehicle)
 def encrypt_vehicle(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        instance.checksum = hasher.hash(
-            instance.color, instance.brand, instance.VIN, instance.model
-        )
-        instance.color = cipher.encrypt(instance.color)
-        instance.brand = cipher.encrypt(instance.brand)
-        instance.VIN = cipher.encrypt(instance.VIN)
-        instance.model = cipher.encrypt(instance.model)
+    instance.checksum = hasher.hash(
+        instance.color, instance.brand, instance.VIN, instance.model
+    )
+    instance.color = cipher.encrypt(instance.color)
+    instance.brand = cipher.encrypt(instance.brand)
+    instance.VIN = cipher.encrypt(instance.VIN)
+    instance.model = cipher.encrypt(instance.model)
 
 
 @receiver(post_init, sender=Vehicle)
@@ -369,11 +366,8 @@ class House(models.Model):
 
 @receiver(pre_save, sender=House)
 def encrypt_house(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        instance.checksum = hasher.hash(instance.property_type)
-        instance.property_type = cipher.encrypt(instance.property_type)
+    instance.checksum = hasher.hash(instance.property_type)
+    instance.property_type = cipher.encrypt(instance.property_type)
 
 
 @receiver(post_init, sender=House)

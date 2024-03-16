@@ -74,34 +74,46 @@ def update_current_values():
     for u in users:
         if Asset.objects.filter(category='V', user__id=u.id).count() > 0:
             asset_vehicle = Asset.objects.get(category='V', user__id=u.id)
-            asset_vehicle.current_value = get_vehicles_value(
-                Vehicle.objects.all(),
-                asset_vehicle.current_value
-            )
+            if asset_vehicle.purchase_price == 0:
+                asset_vehicle.current_value = 0
+            else:
+                asset_vehicle.current_value = get_vehicles_value(
+                    Vehicle.objects.filter(asset=asset_vehicle).all(),
+                    asset_vehicle.current_value
+                )
             asset_vehicle.save()
 
         if Asset.objects.filter(category='R', user__id=u.id).count() > 0:
             asset_house = Asset.objects.get(category='R', user__id=u.id)
-            asset_house.current_value = get_houses_value(
-                House.objects.all(),
-                asset_house.current_value
-            )
+            if asset_house.purchase_price == 0:
+                asset_house.current_value = 0
+            else:
+                asset_house.current_value = get_houses_value(
+                    House.objects.filter(asset=asset_house).all(),
+                    asset_house.current_value
+                )
             asset_house.save()
 
         if Asset.objects.filter(category='C', user__id=u.id).count() > 0:
             asset_crypto = Asset.objects.get(category='C', user__id=u.id)
-            asset_crypto.current_value = get_cryptos_value(
-                Crypto.objects.all(),
-                asset_crypto.current_value
-            )
+            if asset_crypto.purchase_price == 0:
+                asset_crypto.current_value = 0
+            else:
+                asset_crypto.current_value = get_cryptos_value(
+                    Crypto.objects.filter(asset=asset_crypto).all(),
+                    asset_crypto.current_value
+                )
             asset_crypto.save()
 
         if Asset.objects.filter(category='E', user__id=u.id).count() > 0:
             asset_stock = Asset.objects.get(category='E', user__id=u.id)
-            asset_stock.current_value = get_stocks_value(
-                Stock.objects.all(),
-                asset_stock.current_value
-            )
+            if asset_stock.purchase_price == 0:
+                asset_stock.current_value = 0
+            else:
+                asset_stock.current_value = get_stocks_value(
+                    Stock.objects.filter(asset=asset_stock).all(),
+                    asset_stock.current_value
+                )
             asset_stock.save()
 
 def setup_schedule():
