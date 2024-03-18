@@ -163,6 +163,20 @@ class Asset(models.Model):
     class Meta:
         ordering = ['category']
 
+    def __str__(self):
+        for c in AssetType.CHOICES:
+            if c[0] == str(self.category):
+                return f"Asset ({c[1]})"
+        return f"Asset ({self.category})"
+
+class AssetHistory(models.Model):
+    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
+    record_date = models.DateField()
+    record_value = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ["record_date", "id"]
+
 
 class Vehicle(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)

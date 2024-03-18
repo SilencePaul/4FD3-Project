@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
-from .models import CryptoTransaction, StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType, Cipher, Hasher
+from .models import CryptoTransaction, StockTransaction, Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, PropertyType, Cipher, Hasher, AssetHistory
 from enum import Enum, auto
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.core.cache import cache
 from datetime import timedelta
 from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_cryptos_value, get_stocks_value
+from django.db.models import Count, Avg
 
 setup_schedule()
 
@@ -24,6 +25,53 @@ class VIEWTYPE(Enum):
     buy_or_sell = auto()
 
 # Create your views here.
+
+ADMIN_ID = User.objects.get(username='admin').id
+
+def report(request):
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
+        return redirect('login')
+    context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
+
+    context['plot_urls'] = []
+    matplotlib.use('Agg')
+
+    assets = Asset.objects.filter(user__id=uid).all()
+    for a in assets:
+        for c in AssetType.CHOICES:
+            if c[0] == str(a.category):
+                a.category = c[1]
+
+        assetHistory = (AssetHistory.objects
+                        .values('record_date')
+                        .filter(asset=a)
+                        .annotate(day_value=Avg('record_value'))
+                        .order_by('record_date'))
+
+        fig, ax = plt.subplots()
+        record_dates = [h['record_date'] for h in assetHistory]
+        day_values = [h['day_value'] for h in assetHistory]
+        ax.plot(record_dates, day_values, label=a)
+        ax.axhline(y=a.purchase_price, color='r', linestyle='--', label='Purchase Price')
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Value')
+        ax.set_title(f'{a} History Value')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        ax.legend()
+        img = io.BytesIO()
+        plt.savefig(img, format='png')
+        img.seek(0)
+        plot_url = base64.b64encode(img.getvalue()).decode()
+        context['plot_urls'].append(f'data:image/png;base64,{plot_url}')
+
+    context['assets'] = assets
+
+    #context['assetHistory'] = assetHistory
+
+    return render(request, 'report.html', context)
 
 def register(request):
     context = {}
@@ -85,6 +133,7 @@ def home(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
 
     if User.objects.filter(username='admin', id=uid).count() > 0:
         admin = User.objects.get(username='admin', id=uid)
@@ -96,6 +145,7 @@ def index(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     context['stocks'] = Stock.objects.filter(asset__user__id=uid).all()
     context['crypto'] = None
     context['vehicle'] = None
@@ -112,6 +162,7 @@ def vehicle(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
@@ -173,6 +224,7 @@ def house(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
         if VIEWTYPE[viewtype] is VIEWTYPE.list:
@@ -273,6 +325,7 @@ def stock(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     ticker = request.GET.get('ticker', None)
     apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
     if ticker:
@@ -449,7 +502,11 @@ def stock(request):
         return redirect('stock')
 
 def stock_search(request, stock_ticker):
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
+        return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         stock = Stock.objects.filter(ticker_symbol=stock_ticker)
         if stock:
@@ -494,6 +551,7 @@ def crypto(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     ticker = request.GET.get('ticker', None)
     apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
     if ticker:
@@ -668,7 +726,11 @@ def crypto(request):
 
 
 def crypto_search(request, crypto_ticker):
+    uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
+    if cache.get(uid, False) is not True:
+        return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         crypto = Crypto.objects.filter(ticker_symbol=crypto_ticker)
         if crypto:
@@ -713,6 +775,9 @@ def user(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
+    if uid != str(ADMIN_ID):
+        return redirect('home')
     if request.method == "GET":
         total = User.objects.count()
         size = int(request.GET.get('size', 20))
@@ -733,6 +798,7 @@ def asset(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         query = Asset.objects.filter(user__id=uid)
         total = query.count()

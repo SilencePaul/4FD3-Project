@@ -1,5 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from .models import Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory
+from .models import Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, AssetHistory
 from datetime import datetime, timedelta
 import requests
 
@@ -70,6 +70,7 @@ def get_stocks_value(stocks, default):
         return default*0.9955
 
 def update_current_values():
+    today = datetime.today()
     users = User.objects.all()
     for u in users:
         if Asset.objects.filter(category='V', user__id=u.id).count() > 0:
@@ -82,6 +83,7 @@ def update_current_values():
                     asset_vehicle.current_value
                 )
             asset_vehicle.save()
+            AssetHistory(asset=asset_vehicle, record_date=today, record_value=asset_vehicle.current_value).save()
 
         if Asset.objects.filter(category='R', user__id=u.id).count() > 0:
             asset_house = Asset.objects.get(category='R', user__id=u.id)
@@ -93,6 +95,7 @@ def update_current_values():
                     asset_house.current_value
                 )
             asset_house.save()
+            AssetHistory(asset=asset_house, record_date=today, record_value=asset_house.current_value).save()
 
         if Asset.objects.filter(category='C', user__id=u.id).count() > 0:
             asset_crypto = Asset.objects.get(category='C', user__id=u.id)
@@ -104,6 +107,7 @@ def update_current_values():
                     asset_crypto.current_value
                 )
             asset_crypto.save()
+            AssetHistory(asset=asset_crypto, record_date=today, record_value=asset_crypto.current_value).save()
 
         if Asset.objects.filter(category='E', user__id=u.id).count() > 0:
             asset_stock = Asset.objects.get(category='E', user__id=u.id)
@@ -115,11 +119,12 @@ def update_current_values():
                     asset_stock.current_value
                 )
             asset_stock.save()
+            AssetHistory(asset=asset_stock, record_date=today, record_value=asset_stock.current_value).save()
 
 def setup_schedule():
-    update_current_values()
     scheduler = BackgroundScheduler()
     try:
+        update_current_values()
         scheduler.add_job(update_current_values, 'interval', hours=1,
                           id='update_current_values', replace_existing=True)
         scheduler.start()

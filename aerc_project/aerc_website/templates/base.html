@@ -35,9 +35,14 @@
                                 <a class="navbar-item {% if request.path == '/home' or request.path == '/' %}is-active{% endif %}" href="/home">
                                     Home
                                 </a>
-                                <a class="navbar-item {% if request.path == '/user' %}is-active{% endif %}" href="/user">
-                                    User
+                                <a class="navbar-item {% if request.path == '/report' %}is-active{% endif %}" href="/report">
+                                    Report
                                 </a>
+                                {% if isAdmin %}
+                                    <a class="navbar-item {% if request.path == '/user' %}is-active{% endif %}" href="/user">
+                                        User
+                                    </a>
+                                {% endif %}
                                 <a class="navbar-item {% if request.path == '/asset' %}is-active{% endif %}" href="/asset">
                                     Asset
                                 </a>

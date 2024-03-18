@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Asset Management</h2>
+        <p class="subtitle is-4">View asset report</p>
+        <div class="table-container">
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <td>Asset Type</td>
+                        <td>Purchase Price</td>
+                        <td>Current Value</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for info in assets %}
+                        <tr>
+                            <td>{{ info.category }}</td>
+                            <td>{{ info.purchase_price|floatformat:2 }}</td>
+                            <td>{{ info.current_value|floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% for url in plot_urls %}
+        <div class="container">
+            <div class="columns is-vcentered is-centered">
+                <div class="column is-half">
+                    <figure class="image">
+                        <img src={{url}} alt="Graph Image">
+                    </figure>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}
