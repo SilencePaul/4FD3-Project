@@ -240,7 +240,7 @@ class Stock(models.Model):
     currency = models.CharField(max_length=3, default="")
     purchase_date = models.DateField()
     checksum = models.CharField("checksum", max_length=255, blank=True)
-    checksumOk = False
+    checksumOk = True
 
     class Meta:
         ordering = ["ticker_symbol"]
@@ -292,7 +292,7 @@ class Crypto(models.Model):
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateField()
     checksum = models.CharField("checksum", max_length=255, blank=True)
-    checksumOk = False
+    checksumOk = True
 
     class Meta:
         ordering = ["ticker_symbol"]

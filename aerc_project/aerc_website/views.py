@@ -134,6 +134,10 @@ def home(request):
         return redirect('login')
     context = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
+    context['stocks'] = Stock.objects.filter(asset__user__id=uid).all()
+    context['crypto'] = None
+    context['vehicle'] = None
+    context['house'] = None
 
     if User.objects.filter(username='admin', id=uid).count() > 0:
         admin = User.objects.get(username='admin', id=uid)
