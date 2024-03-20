@@ -12,8 +12,7 @@ def add_data(apps, schema_editor):
             if row['New housing price indexes'] == 'House only':
                 value = 0 if len(row['VALUE']) == 0 else eval(row['VALUE'])
                 data = HousingIndex.objects.create(location=row['GEO'], date=f"{row['REF_DATE']}-01", index=value)
-                break
-                # print(f"{data.id:>05} Data inserted: location - {data.location}, time - {data.date}, index - {data.index}")
+                print(f"{data.id:>05} Data inserted: location - {data.location}, time - {data.date}, index - {data.index}")
 
 def remove_data(apps, schema_editor):
     HousingIndex = apps.get_model('aerc_website', 'HousingIndex')
