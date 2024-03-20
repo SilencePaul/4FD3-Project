@@ -128,6 +128,9 @@ def setup_schedule():
         scheduler.add_job(update_current_values, 'interval', hours=1,
                           id='update_current_values', replace_existing=True)
         scheduler.start()
-    except Exception as e:
-        print(e)
-        scheduler.shutdown()
+    except Exception as e1:
+        print(e1)
+        try:
+            scheduler.shutdown()
+        except Exception as e2:
+            print(e2)

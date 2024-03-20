@@ -135,9 +135,9 @@ def home(request):
     context = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
     context['stocks'] = Stock.objects.filter(asset__user__id=uid).all()
-    context['crypto'] = None
-    context['vehicle'] = None
-    context['house'] = None
+    context['cryptos'] = Crypto.objects.filter(asset__user__id=uid).all()
+    context['vehicles'] = Vehicle.objects.filter(asset__user__id=uid).all()
+    context['houses'] = House.objects.filter(asset__user__id=uid).all()
 
     if User.objects.filter(username='admin', id=uid).count() > 0:
         admin = User.objects.get(username='admin', id=uid)
@@ -151,9 +151,9 @@ def index(request):
     context = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
     context['stocks'] = Stock.objects.filter(asset__user__id=uid).all()
-    context['crypto'] = None
-    context['vehicle'] = None
-    context['house'] = None
+    context['cryptos'] = Crypto.objects.filter(asset__user__id=uid).all()
+    context['vehicles'] = Vehicle.objects.filter(asset__user__id=uid).all()
+    context['houses'] = House.objects.filter(asset__user__id=uid).all()
 
     if User.objects.filter(username='admin', id=uid).count() > 0:
         admin = User.objects.get(username='admin', id=uid)

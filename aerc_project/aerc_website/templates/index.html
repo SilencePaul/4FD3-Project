@@ -24,6 +24,7 @@
                 <div id="crypto_info" class="is-flex is-flex-direction-column is-align-items-center"></div>
             </div>
         </div>
+        <!--
         <div class="columns">
             <div class="column is-half">
                 <label class="label">House info:</label>
@@ -38,6 +39,7 @@
                 </div>
             </div>
         </div>
+        -->
     </div>
 </section>
 <section class="section">
@@ -81,7 +83,7 @@
                     <div class="card-content">
                         <p class="title">Crypto</p>
                         <p class="subtitle">
-                            {% if stocks %}
+                            {% if cryptos %}
                             <table class="table is-striped is-narrow is-hoverable is-fullwidth">
                                 <thead>
                                     <tr>
@@ -110,8 +112,23 @@
                     <div class="card-content">
                         <p class="title">House</p>
                         <p class="subtitle">
-                            {% if house %}
-                                {{ house }}
+                            {% if houses %}
+                            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>Postal Code</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for house in houses %}
+                                        <tr>
+                                            <td>{{ house.postal_code }}</td>
+                                            <td>{{ house.purchase_price|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                             {% else %}
                                 No house information
                             {% endif %}
@@ -124,8 +141,23 @@
                     <div class="card-content">
                         <p class="title">Vehicle</p>
                         <p class="subtitle">
-                            {% if vehicle %}
-                                {{ vehicle }}
+                            {% if vehicles %}
+                            <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>VIN</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vehicle in vehicles %}
+                                        <tr>
+                                            <td>{{ vehicle.VIN }}</td>
+                                            <td>{{ vehicle.purchase_price|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                             {% else %}
                                 No vehicle information
                             {% endif %}
