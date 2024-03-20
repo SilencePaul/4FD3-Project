@@ -24,9 +24,10 @@ class VIEWTYPE(Enum):
     add = auto()
     buy_or_sell = auto()
 
-# Create your views here.
-
-ADMIN_ID = User.objects.get(username='admin').id
+try:
+    ADMIN_ID = User.objects.get(username='admin').id
+except User.DoesNotExist:
+    ADMIN_ID = None
 
 def report(request):
     uid = Cipher().decrypt(request.COOKIES.get(USER_ID, ''))
