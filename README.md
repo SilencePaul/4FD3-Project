@@ -18,6 +18,10 @@ If you changed `models.py` file, run `python manage.py makemigrations` and `pyth
 
 `python manage.py runserver`
 
+## Run Test
+
+Execute command, `python manage.py test`
+
 ## Directory Description
 
 - Frontend staff like `.html` files in `templates` folder.
