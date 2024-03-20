@@ -25,16 +25,16 @@
             </table>
         </div>
     </div>
-    {% for url in plot_urls %}
-        <div class="container">
-            <div class="columns is-vcentered is-centered">
-                <div class="column is-half">
+    <div class="container">
+        <div class="columns is-vcentered is-centered">
+            {% for url in plot_urls %}
+                <div class="column is-one-quarter">
                     <figure class="image">
                         <img src={{url}} alt="Graph Image">
                     </figure>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-    {% endfor %}
+    </div>
 </section>
 {% endblock %}
