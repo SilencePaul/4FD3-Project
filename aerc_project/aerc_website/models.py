@@ -246,7 +246,6 @@ class Stock(models.Model):
         ordering = ["ticker_symbol"]
         verbose_name = "Stock"
         verbose_name_plural = "Stocks"
-        unique_together = ("ticker_symbol", "market")
 
     def __str__(self):
         return f"{self.ticker_symbol} ({self.market})"

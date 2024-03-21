@@ -32,5 +32,5 @@ urlpatterns = [
     path('asset', views.asset, name='asset'),
     re_path(r'^stock_search/(?P<stock_ticker>[^/]+)/$', views.stock_search, name='stock-search'),
     re_path(r'^crypto_search/(?P<crypto_ticker>[^/]+)/$', views.crypto_search, name='crypto-search'),
-    re_path(r'^', views.logout, name='redirect_logout') # catch all other url, and redirect to logout for enhanced security
+    re_path(r'^$', views.logout, name='redirect_logout') # catch all other url, and redirect to logout for enhanced security
 ]

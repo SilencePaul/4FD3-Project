@@ -370,7 +370,11 @@ def stock(request):
                 context['data'] = Stock.objects.get(id=id)
             return render(request, 'stock/buy_or_sell.html', context)
         elif VIEWTYPE[viewtype] is VIEWTYPE.add:
+            stock = Stock.objects.filter(ticker_symbol=ticker)
             if ticker:
+                if stock:
+                    context['data'] = stock[0]
+                    return render(request, 'stock/buy_or_sell.html', context)
                 return render(request, 'stock/add.html', context)
             else:
                 return render(request, 'stock/new_stock.html')
@@ -595,7 +599,11 @@ def crypto(request):
                 context['data'] = Crypto.objects.get(id=id)
             return render(request, 'crypto/buy_or_sell.html', context)
         elif VIEWTYPE[viewtype] is VIEWTYPE.add:
+            crypto = Crypto.objects.filter(ticker_symbol=ticker)
             if ticker:
+                if crypto:
+                    context['data'] = crypto[0]
+                    return render(request, 'crypto/buy_or_sell.html', context)
                 return render(request, 'crypto/add.html', context)
             else:
                 return render(request, 'crypto/new_crypto.html')
