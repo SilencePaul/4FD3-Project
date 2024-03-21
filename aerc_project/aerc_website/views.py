@@ -26,7 +26,7 @@ class VIEWTYPE(Enum):
 
 try:
     ADMIN_ID = User.objects.get(username='admin').id
-except User.DoesNotExist:
+except Exception as e:
     ADMIN_ID = None
 
 def report(request):
@@ -488,21 +488,23 @@ def stock(request):
             currency = request.POST.get('currency', "")
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
-            stock = Stock(
-                asset_id=asset.id,
-                share=share,
-                ticker_symbol=ticker_symbol,
-                market=market,
-                currency=currency,
-                purchase_price=purchase_price,
-                purchase_date=purchase_date)
-            stock.save()
-            initial_transaction = StockTransaction(
-                stock=stock,
-                share=share,
-                purchase_price=purchase_price,
-                purchase_date=purchase_date)
-            initial_transaction.save()
+            # user ticker_symbol+market unique check
+            if Stock.object.filter(asset__user__id=uid, ticker_symbol=ticker_symbol, market=market).count() == 0:
+                stock = Stock(
+                    asset_id=asset.id,
+                    share=share,
+                    ticker_symbol=ticker_symbol,
+                    market=market,
+                    currency=currency,
+                    purchase_price=purchase_price,
+                    purchase_date=purchase_date)
+                stock.save()
+                initial_transaction = StockTransaction(
+                    stock=stock,
+                    share=share,
+                    purchase_price=purchase_price,
+                    purchase_date=purchase_date)
+                initial_transaction.save()
         # update asset
         targets = Stock.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
@@ -520,7 +522,7 @@ def stock_search(request, stock_ticker):
         stock = Stock.objects.filter(ticker_symbol=stock_ticker)
         if stock:
             context["stock"] = stock[0]
-            render(request, '_stock_verify.html', context)
+            return render(request, '_stock_verify.html', context)
         else:
             context["stock"] = None
         stock_ticker = stock_ticker.upper()
@@ -748,7 +750,7 @@ def crypto_search(request, crypto_ticker):
         crypto = Crypto.objects.filter(ticker_symbol=crypto_ticker)
         if crypto:
             context["crypto"] = crypto[0]
-            render(request, '_crypto_verify.html', context)
+            return render(request, '_crypto_verify.html', context)
         else:
             context["crypto"] = None
         crypto_ticker = crypto_ticker.upper()
@@ -761,7 +763,7 @@ def crypto_search(request, crypto_ticker):
         }
         response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
         response_json = response.json()
-        
+
         response_json_results = response_json["results"]
         result_count = len(response_json_results)
         result_list = []
