@@ -1,8 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
+    @media print {
+        body > header, .btn-print {
+            display: none;
+        }
+        .columns:not(.is-desktop) {
+            flex-direction: column;
+        }
+        .column.is-one-quarter, .column.is-one-quarter-tablet {
+            width: auto;
+        }
+    }
+
+    .space-heading {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
 <section class="section">
     <div class="container">
-        <h2 class="title is-2">Asset Management</h2>
+        <h2 class="title is-2 space-heading">Asset Management<button class="button is-primary is-light btn-print" onclick="window.print()">Print</button></h2>
         <p class="subtitle is-4">View asset report</p>
         <div class="table-container">
             <table class="table is-striped is-hoverable is-fullwidth">
@@ -24,16 +42,16 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div class="container">
-        <div class="columns is-vcentered is-centered">
-            {% for url in plot_urls %}
-                <div class="column is-one-quarter">
-                    <figure class="image">
-                        <img src={{url}} alt="Graph Image">
-                    </figure>
-                </div>
-            {% endfor %}
+        <div class="container">
+            <div class="columns is-vcentered is-centered">
+                {% for url in plot_urls %}
+                    <div class="column is-one-quarter">
+                        <figure class="image">
+                            <img src={{url}} alt="Graph Image">
+                        </figure>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </section>
