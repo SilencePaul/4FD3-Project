@@ -17,6 +17,8 @@ setup_schedule()
 
 USER_ID = "uid"
 
+ALERT_COUNT = 5
+
 class VIEWTYPE(Enum):
     list = auto()
     detail = auto()
@@ -140,6 +142,55 @@ def home(request):
     context['vehicles'] = Vehicle.objects.filter(asset__user__id=uid).all()
     context['houses'] = House.objects.filter(asset__user__id=uid).all()
 
+    now = datetime.now()
+    weekAgo = now - timedelta(days=7)
+    historyCrypto = (AssetHistory.objects
+                     .filter(asset__category='C', asset__user__id=uid, record_date__lte=now, record_date__gt=weekAgo)
+                     .order_by('record_date').all())
+    historyStock = (AssetHistory.objects
+                    .filter(asset__category='E', asset__user__id=uid, record_date__lte=now, record_date__gt=weekAgo)
+                    .order_by('record_date').all())
+    historyHouse = (AssetHistory.objects
+                    .filter(asset__category='R', asset__user__id=uid, record_date__lte=now, record_date__gt=weekAgo)
+                    .order_by('record_date').all())
+
+    if len(historyCrypto) > 1:
+        count = 0
+        top = historyCrypto[0].record_value
+        bottom = top
+        for h in historyCrypto:
+            if h.record_value < top:
+                count += 1
+                if h.record_value < bottom:
+                    bottom = h.record_value
+        if count >= ALERT_COUNT:
+            context['alertCrypto'] = f"Crypto asset had frequent drops of {count} within the last week!"
+            context['dropCrypto'] = f"Crypto asset had a maximum drop of {bottom - top:.2f}!"
+    if len(historyStock) > 1:
+        count = 0
+        top = historyStock[0].record_value
+        bottom = top
+        for h in historyStock:
+            if h.record_value < top:
+                count += 1
+                if h.record_value < bottom:
+                    bottom = h.record_value
+        if count >= ALERT_COUNT:
+            context['alertStock'] = f"Stock asset had frequent drops of {count} within the last week!"
+            context['dropStock'] = f"Stock asset had a maximum drop of {bottom - top:.2f}!"
+    if len(historyHouse) > 1:
+        count = 0
+        top = historyHouse[0].record_value
+        bottom = top
+        for h in historyHouse:
+            if h.record_value < top:
+                count += 1
+                if h.record_value < bottom:
+                    bottom = h.record_value
+        if count >= ALERT_COUNT:
+            context['alertHouse'] = f"Real Estate asset had frequent drops of {count} within the last week!"
+            context['dropHouse'] = f"Real Estate asset had a maximum drop of {bottom - top:.2f}!"
+
     if User.objects.filter(username='admin', id=uid).count() > 0:
         admin = User.objects.get(username='admin', id=uid)
         context['passcode'] = Hasher().hash(admin.checksum + datetime.now().strftime('%d/%m/%y')).encode('utf-8').hex()[:8]
@@ -155,6 +206,55 @@ def index(request):
     context['cryptos'] = Crypto.objects.filter(asset__user__id=uid).all()
     context['vehicles'] = Vehicle.objects.filter(asset__user__id=uid).all()
     context['houses'] = House.objects.filter(asset__user__id=uid).all()
+
+    now = datetime.now()
+    weekAgo = now - timedelta(days=7)
+    historyCrypto = (AssetHistory.objects
+                     .filter(asset__category='C', asset__user__id=uid, record_date__lte=now, record_date__gt=weekAgo)
+                     .order_by('record_date').all())
+    historyStock = (AssetHistory.objects
+                    .filter(asset__category='E', asset__user__id=uid, record_date__lte=now, record_date__gt=weekAgo)
+                    .order_by('record_date').all())
+    historyHouse = (AssetHistory.objects
+                    .filter(asset__category='R', asset__user__id=uid, record_date__lte=now, record_date__gt=weekAgo)
+                    .order_by('record_date').all())
+
+    if len(historyCrypto) > 1:
+        count = 0
+        top = historyCrypto[0].record_value
+        bottom = top
+        for h in historyCrypto:
+            if h.record_value < top:
+                count += 1
+                if h.record_value < bottom:
+                    bottom = h.record_value
+        if count >= ALERT_COUNT:
+            context['alertCrypto'] = f"Crypto asset had frequent drops of {count} within the last week!"
+            context['dropCrypto'] = f"Crypto asset had a maximum drop of {bottom - top:.2f}!"
+    if len(historyStock) > 1:
+        count = 0
+        top = historyStock[0].record_value
+        bottom = top
+        for h in historyStock:
+            if h.record_value < top:
+                count += 1
+                if h.record_value < bottom:
+                    bottom = h.record_value
+        if count >= ALERT_COUNT:
+            context['alertStock'] = f"Stock asset had frequent drops of {count} within the last week!"
+            context['dropStock'] = f"Stock asset had a maximum drop of {bottom - top:.2f}!"
+    if len(historyHouse) > 1:
+        count = 0
+        top = historyHouse[0].record_value
+        bottom = top
+        for h in historyHouse:
+            if h.record_value < top:
+                count += 1
+                if h.record_value < bottom:
+                    bottom = h.record_value
+        if count >= ALERT_COUNT:
+            context['alertHouse'] = f"Real Estate asset had frequent drops of {count} within the last week!"
+            context['dropHouse'] = f"Real Estate asset had a maximum drop of {bottom - top:.2f}!"
 
     if User.objects.filter(username='admin', id=uid).count() > 0:
         admin = User.objects.get(username='admin', id=uid)

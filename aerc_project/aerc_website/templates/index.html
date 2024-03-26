@@ -4,8 +4,24 @@
     <div class="container">
         <h2 class="title is-2">Welcome to the Asset Management System</h2>
         <p class="subtitle is-4">Please enter your asset information below</p>
-    </div>
-    <div class="container">
+        {% if alertCrypto %}
+            <div class="notification is-warning">
+                <p>{{alertCrypto}}</p>
+                <p>{{dropCrypto}}</p>
+            </div>
+        {% endif %}
+        {% if alertStock %}
+            <div class="notification is-warning">
+                <p>{{alertStock}}</p>
+                <p>{{dropStock}}</p>
+            </div>
+        {% endif %}
+        {% if alertHouse %}
+            <div class="notification is-warning">
+                <p>{{alertHouse}}</p>
+                <p>{{dropHouse}}</p>
+            </div>
+        {% endif %}
         <div class="columns">
             <div class="column is-half">
                 <label class="label">Stock info:</label>

@@ -83,7 +83,12 @@ def update_current_values():
                     asset_vehicle.current_value
                 )
             asset_vehicle.save()
-            AssetHistory(asset=asset_vehicle, record_date=today, record_value=asset_vehicle.current_value).save()
+            if AssetHistory.objects.filter(asset=asset_vehicle, record_date=today).count() > 0:
+                historyVehicle = AssetHistory.objects.get(asset=asset_vehicle, record_date=today)
+                historyVehicle.record_value = asset_vehicle.current_value
+                historyVehicle.save()
+            else:
+                AssetHistory(asset=asset_vehicle, record_date=today, record_value=asset_vehicle.current_value).save()
 
         if Asset.objects.filter(category='R', user__id=u.id).count() > 0:
             asset_house = Asset.objects.get(category='R', user__id=u.id)
@@ -95,7 +100,12 @@ def update_current_values():
                     asset_house.current_value
                 )
             asset_house.save()
-            AssetHistory(asset=asset_house, record_date=today, record_value=asset_house.current_value).save()
+            if AssetHistory.objects.filter(asset=asset_house, record_date=today).count() > 0:
+                historyHouse = AssetHistory.objects.get(asset=asset_house, record_date=today)
+                historyHouse.record_value = asset_house.current_value
+                historyHouse.save()
+            else:
+                AssetHistory(asset=asset_house, record_date=today, record_value=asset_house.current_value).save()
 
         if Asset.objects.filter(category='C', user__id=u.id).count() > 0:
             asset_crypto = Asset.objects.get(category='C', user__id=u.id)
@@ -107,7 +117,12 @@ def update_current_values():
                     asset_crypto.current_value
                 )
             asset_crypto.save()
-            AssetHistory(asset=asset_crypto, record_date=today, record_value=asset_crypto.current_value).save()
+            if AssetHistory.objects.filter(asset=asset_crypto, record_date=today).count() > 0:
+                historyCrypto = AssetHistory.objects.get(asset=asset_crypto, record_date=today)
+                historyCrypto.record_value = asset_crypto.current_value
+                historyCrypto.save()
+            else:
+                AssetHistory(asset=asset_crypto, record_date=today, record_value=asset_crypto.current_value).save()
 
         if Asset.objects.filter(category='E', user__id=u.id).count() > 0:
             asset_stock = Asset.objects.get(category='E', user__id=u.id)
@@ -119,7 +134,12 @@ def update_current_values():
                     asset_stock.current_value
                 )
             asset_stock.save()
-            AssetHistory(asset=asset_stock, record_date=today, record_value=asset_stock.current_value).save()
+            if AssetHistory.objects.filter(asset=asset_stock, record_date=today).count() > 0:
+                historyStock = AssetHistory.objects.get(asset=asset_stock, record_date=today)
+                historyStock.record_value = asset_stock.current_value
+                historyStock.save()
+            else:
+                AssetHistory(asset=asset_stock, record_date=today, record_value=asset_stock.current_value).save()
 
 def setup_schedule():
     scheduler = BackgroundScheduler()
