@@ -1,58 +1,71 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <style>
-    @media print {
-        body > header, .btn-print {
-            display: none;
-        }
-        .columns:not(.is-desktop) {
-            flex-direction: column;
-        }
-        .column.is-one-quarter, .column.is-one-quarter-tablet {
-            width: auto;
-        }
+  @media print {
+    body > header,
+    .btn-print {
+      display: none;
     }
+    .columns:not(.is-desktop) {
+      flex-direction: column;
+    }
+    .column.is-one-quarter,
+    .column.is-one-quarter-tablet {
+      width: auto;
+    }
+  }
 
-    .space-heading {
-        display: flex;
-        justify-content: space-between;
-    }
+  .space-heading {
+    display: flex;
+    justify-content: space-between;
+  }
 </style>
 <section class="section">
+  <div class="container">
+    <h2 class="title is-2 space-heading">
+      Asset Management<button
+        class="button is-primary is-light btn-print"
+        onclick="window.print()"
+      >
+        Print
+      </button>
+    </h2>
+    <p class="subtitle is-4">View asset report</p>
     <div class="container">
-        <h2 class="title is-2 space-heading">Asset Management<button class="button is-primary is-light btn-print" onclick="window.print()">Print</button></h2>
-        <p class="subtitle is-4">View asset report</p>
-        <div class="table-container">
-            <table class="table is-striped is-hoverable is-fullwidth">
-                <thead>
-                    <tr>
-                        <td>Asset Type</td>
-                        <td>Purchase Price</td>
-                        <td>Current Value</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for info in assets %}
-                        <tr>
-                            <td>{{ info.category }}</td>
-                            <td>{{ info.purchase_price|floatformat:2 }}</td>
-                            <td>{{ info.current_value|floatformat:2 }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="container">
-            <div class="columns is-vcentered is-centered">
-                {% for url in plot_urls %}
-                    <div class="column is-one-quarter">
-                        <figure class="image">
-                            <img src={{url}} alt="Graph Image">
-                        </figure>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+      <div class="notification is-primary">
+        <p class="subtitle is-5">Risk Rating: {{ risk|floatformat:2 }}</p>
+      </div>
     </div>
+    <div class="table-container">
+      <table class="table is-striped is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <td>Asset Type</td>
+            <td>Purchase Price</td>
+            <td>Current Value</td>
+          </tr>
+        </thead>
+        <tbody>
+          {% for info in assets %}
+          <tr>
+            <td>{{ info.category }}</td>
+            <td>{{ info.purchase_price|floatformat:2 }}</td>
+            <td>{{ info.current_value|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="container">
+      <div class="columns is-vcentered is-centered">
+        {% for url in plot_urls %}
+        <div class="column is-one-quarter">
+          <figure class="image">
+            <img src="{{url}}" alt="Graph Image" />
+          </figure>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </section>
 {% endblock %}

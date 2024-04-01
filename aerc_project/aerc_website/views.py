@@ -73,6 +73,19 @@ def report(request):
     context['assets'] = assets
 
     #context['assetHistory'] = assetHistory
+    weighted_risk = 0
+    total_value = 0
+    for a in assets:
+        if a.category == 'Crypto':
+            weighted_risk += a.purchase_price * 3
+        elif a.category == 'Stock':
+            weighted_risk += a.purchase_price * 6
+        elif a.category == 'Real Estate':
+            weighted_risk += a.purchase_price * 9.5
+        else:
+            weighted_risk += a.purchase_price * 4
+        total_value += a.purchase_price
+    context['risk'] = weighted_risk/total_value
 
     return render(request, 'report.html', context)
 
