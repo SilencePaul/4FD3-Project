@@ -294,7 +294,8 @@ def vehicle(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='V', user__id=uid)
+        user = User.objects.get(pk=uid)
+        asset, _ = Asset.objects.get_or_create(category='V', user=user)
         if _method == "delete":
             Vehicle.objects.get(id=id).delete()
         else:
@@ -384,7 +385,8 @@ def house(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='R', user__id=uid)
+        user = User.objects.get(pk=uid)
+        asset, _ = Asset.objects.get_or_create(category='R', user=user)
         if _method == "delete":
             House.objects.get(id=id).delete()
         else:
@@ -561,7 +563,8 @@ def stock(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='E', user__id=uid)
+        user = User.objects.get(pk=uid)
+        asset, _ = Asset.objects.get_or_create(category='E', user=user)
         if _method == "delete":
             Stock.objects.get(id=id).delete()
         elif _method == "buy_or_sell":
@@ -589,7 +592,7 @@ def stock(request):
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
             # user ticker_symbol+market unique check
-            if Stock.object.filter(asset__user__id=uid, ticker_symbol=ticker_symbol, market=market).count() == 0:
+            if Stock.objects.filter(asset__user=user, ticker_symbol=ticker_symbol, market=market).count() == 0:
                 stock = Stock(
                     asset_id=asset.id,
                     share=share,
@@ -607,7 +610,7 @@ def stock(request):
                 initial_transaction.save()
         # update asset
         targets = Stock.objects.filter(asset__user__id=uid).all()
-        asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.purchase_price = sum([x.purchase_price * x.share for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
         return redirect('stock')
@@ -790,7 +793,8 @@ def crypto(request):
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
         _method = request.POST.get('_method', None)
-        asset = Asset.objects.get(category='C', user__id=uid)
+        user = User.objects.get(pk=uid)
+        asset, _ = Asset.objects.get_or_create(category='C', user=user)
         if _method == "delete":
             Crypto.objects.get(id=id).delete()
         elif _method == "buy_or_sell":
