@@ -1,3 +1,5 @@
+from threading import Thread
+
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
@@ -10,7 +12,7 @@ import urllib, base64
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.core.cache import cache
 from datetime import timedelta
-from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_cryptos_value, get_stocks_value
+from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_cryptos_value, get_stocks_value, update_current_values
 from django.db.models import Count, Avg
 
 setup_schedule()
@@ -346,6 +348,7 @@ def vehicle(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('vehicle')
 
 def house(request):
@@ -447,6 +450,7 @@ def house(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('house')
 
 
@@ -636,6 +640,7 @@ def stock(request):
         asset.purchase_price = sum([x.purchase_price * x.share for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('stock')
 
 def stock_search(request, stock_ticker):
@@ -864,6 +869,7 @@ def crypto(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('crypto')
 
 
