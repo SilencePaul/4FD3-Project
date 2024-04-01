@@ -32,7 +32,9 @@
     <p class="subtitle is-4">View asset report</p>
     <div class="container">
       <div class="notification is-primary">
-        <p class="subtitle is-5">Risk Rating: {{ risk|floatformat:2 }}</p>
+        <p class="subtitle is-5">
+          Risk Rating: {{ risk|floatformat:2 }} ({{ level }})
+        </p>
       </div>
     </div>
     <div class="table-container">
