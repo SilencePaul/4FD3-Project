@@ -2,6 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from .models import Vehicle, House, Crypto, Stock, User, Asset, AssetType, LocationCategory, AssetHistory
 from datetime import datetime, timedelta
 import requests
+import json
 
 def get_vehicles_value(vehicles, default):
     try:
@@ -36,10 +37,14 @@ def get_cryptos_value(cryptos, default):
             }
             response = requests.get(url, params=params)
             data = response.json()
-            results = data["results"]
-            last = len(results)-1
-            res += results[last]['c']
-        return res * share
+            #print(json.dumps(data))
+            if "results" in data:
+                results = data["results"]
+                last = len(results)-1
+                res += results[last]['c'] * share
+            else:
+                raise
+        return res
     except:
         return default*0.9955
 
@@ -61,11 +66,14 @@ def get_stocks_value(stocks, default):
             }
             response = requests.get(url, params=params)
             data = response.json()
+            #print(json.dumps(data))
             if "results" in data:
                 results = data["results"]
                 last = len(results)-1
-                res += results[last]['c']
-        return res*share
+                res += results[last]['c'] * share
+            else:
+                raise
+        return res
     except:
         return default*0.9955
 

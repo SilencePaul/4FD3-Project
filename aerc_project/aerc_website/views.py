@@ -1,3 +1,5 @@
+from threading import Thread
+
 from django.shortcuts import render, redirect
 import matplotlib
 import requests
@@ -10,7 +12,7 @@ import urllib, base64
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.core.cache import cache
 from datetime import timedelta
-from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_cryptos_value, get_stocks_value
+from .schedule import setup_schedule, get_vehicles_value, get_houses_value, get_cryptos_value, get_stocks_value, update_current_values
 from django.db.models import Count, Avg
 
 setup_schedule()
@@ -322,6 +324,7 @@ def vehicle(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('vehicle')
 
 def house(request):
@@ -422,6 +425,7 @@ def house(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('house')
 
 
@@ -589,7 +593,7 @@ def stock(request):
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
             # user ticker_symbol+market unique check
-            if Stock.object.filter(asset__user__id=uid, ticker_symbol=ticker_symbol, market=market).count() == 0:
+            if Stock.objects.filter(asset__user__id=uid, ticker_symbol=ticker_symbol, market=market).count() == 0:
                 stock = Stock(
                     asset_id=asset.id,
                     share=share,
@@ -610,6 +614,7 @@ def stock(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('stock')
 
 def stock_search(request, stock_ticker):
@@ -837,6 +842,7 @@ def crypto(request):
         asset.purchase_price = sum([x.purchase_price for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
+        Thread(target=update_current_values).start()
         return redirect('crypto')
 
 
