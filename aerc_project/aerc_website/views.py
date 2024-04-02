@@ -866,7 +866,7 @@ def crypto(request):
             initial_transaction.save()
         # update asset
         targets = Crypto.objects.filter(asset__user__id=uid).all()
-        asset.purchase_price = sum([x.purchase_price for x in targets])
+        asset.purchase_price = sum([x.purchase_price * x.share for x in targets])
         asset.current_value = asset.purchase_price
         asset.save()
         Thread(target=update_current_values).start()
@@ -896,7 +896,7 @@ def crypto_search(request, crypto_ticker):
         }
         response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
         response_json = response.json()
-
+        print(response_json)
         response_json_results = response_json["results"]
         result_count = len(response_json_results)
         result_list = []
@@ -911,6 +911,7 @@ def crypto_search(request, crypto_ticker):
             }
             response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
             response_json = response.json()
+            print(response_json)
             response_json_results = response_json["results"]
             for result in response_json_results:
                 result_list.append(result)
