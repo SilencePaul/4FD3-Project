@@ -133,25 +133,23 @@ def encrypt_user(sender, instance, **kwargs):
 
 
 @receiver(post_init, sender=User)
+@receiver(post_save, sender=User)
 def decrypt_user(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        try:
-            instance.email = cipher.decrypt(instance.email)
-            instance.first_name = cipher.decrypt(instance.first_name)
-            instance.last_name = cipher.decrypt(instance.last_name)
-            instance.gender = cipher.decrypt(instance.gender)
-            instance.checksumOk = hasher.verify(
-                instance.checksum,
-                instance.username,
-                instance.email,
-                instance.first_name,
-                instance.last_name,
-                instance.gender,
-            )
-        except:
-            print("decrypt_user except")
+    try:
+        instance.email = cipher.decrypt(instance.email)
+        instance.first_name = cipher.decrypt(instance.first_name)
+        instance.last_name = cipher.decrypt(instance.last_name)
+        instance.gender = cipher.decrypt(instance.gender)
+        instance.checksumOk = hasher.verify(
+            instance.checksum,
+            instance.username,
+            instance.email,
+            instance.first_name,
+            instance.last_name,
+            instance.gender,
+        )
+    except:
+        print("decrypt_user except")
 
 
 class Asset(models.Model):
@@ -211,24 +209,22 @@ def encrypt_vehicle(sender, instance, **kwargs):
 
 
 @receiver(post_init, sender=Vehicle)
+@receiver(post_save, sender=Vehicle)
 def decrypt_vehicle(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        try:
-            instance.color = cipher.decrypt(instance.color)
-            instance.brand = cipher.decrypt(instance.brand)
-            instance.VIN = cipher.decrypt(instance.VIN)
-            instance.model = cipher.decrypt(instance.model)
-            instance.checksumOk = hasher.verify(
-                instance.checksum,
-                instance.color,
-                instance.brand,
-                instance.VIN,
-                instance.model,
-            )
-        except:
-            print("decrypt_vehicle except")
+    try:
+        instance.color = cipher.decrypt(instance.color)
+        instance.brand = cipher.decrypt(instance.brand)
+        instance.VIN = cipher.decrypt(instance.VIN)
+        instance.model = cipher.decrypt(instance.model)
+        instance.checksumOk = hasher.verify(
+            instance.checksum,
+            instance.color,
+            instance.brand,
+            instance.VIN,
+            instance.model,
+        )
+    except:
+        print("decrypt_vehicle except")
 
 
 class Stock(models.Model):
@@ -266,6 +262,29 @@ class Stock(models.Model):
         self.purchase_date = transaction.purchase_date
         self.save()
 
+@receiver(pre_save, sender=Stock)
+def encrypt_stock(sender, instance, **kwargs):
+    instance.checksum = hasher.hash(
+        instance.ticker_symbol, instance.market, instance.currency
+    )
+    instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
+    instance.market = cipher.encrypt(instance.market)
+    instance.currency = cipher.encrypt(instance.currency)
+
+
+@receiver(post_init, sender=Stock)
+@receiver(post_save, sender=Stock)
+def decrypt_stock(sender, instance, **kwargs):
+    try:
+        instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
+        instance.market = cipher.decrypt(instance.market)
+        instance.currency = cipher.decrypt(instance.currency)
+        instance.checksumOk = hasher.verify(
+            instance.checksum, instance.ticker_symbol, instance.market, instance.currency
+        )
+    except:
+        print("decrypt_stock except")
+
 
 class StockTransaction(models.Model):
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
@@ -291,7 +310,7 @@ class Crypto(models.Model):
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateField()
     checksum = models.CharField("checksum", max_length=255, blank=True)
-    checksumOk = True
+    checksumOk = False
 
     class Meta:
         ordering = ["ticker_symbol"]
@@ -314,6 +333,29 @@ class Crypto(models.Model):
             self.share += transaction.share
         self.purchase_date = transaction.purchase_date
         self.save()
+
+@receiver(pre_save, sender=Crypto)
+def encrypt_crypto(sender, instance, **kwargs):
+    instance.checksum = hasher.hash(
+        instance.ticker_symbol, instance.name, instance.currency
+    )
+    instance.ticker_symbol = cipher.encrypt(instance.ticker_symbol)
+    instance.name = cipher.encrypt(instance.name)
+    instance.currency = cipher.encrypt(instance.currency)
+
+
+@receiver(post_init, sender=Crypto)
+@receiver(post_save, sender=Crypto)
+def decrypt_crypto(sender, instance, **kwargs):
+    try:
+        instance.ticker_symbol = cipher.decrypt(instance.ticker_symbol)
+        instance.name = cipher.decrypt(instance.name)
+        instance.currency = cipher.decrypt(instance.currency)
+        instance.checksumOk = hasher.verify(
+            instance.checksum, instance.ticker_symbol, instance.name, instance.currency
+        )
+    except:
+        print("decrypt_crypto except")
 
 
 class CryptoTransaction(models.Model):
@@ -384,17 +426,15 @@ def encrypt_house(sender, instance, **kwargs):
 
 
 @receiver(post_init, sender=House)
+@receiver(post_save, sender=House)
 def decrypt_house(sender, instance, **kwargs):
-    if instance.id is None:
-        pass
-    else:
-        try:
-            instance.property_type = cipher.decrypt(instance.property_type)
-            instance.checksumOk = hasher.verify(
-                instance.checksum, instance.property_type
-            )
-        except:
-            print("decrypt_house except")
+    try:
+        instance.property_type = cipher.decrypt(instance.property_type)
+        instance.checksumOk = hasher.verify(
+            instance.checksum, instance.property_type
+        )
+    except:
+        print("decrypt_house except")
 
 
 class HousingIndex(models.Model):

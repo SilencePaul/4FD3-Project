@@ -122,7 +122,6 @@ def register(request):
                 context['msgUsername'] = "Username invalid!"
                 return render(request, 'register.html', context)
             newUser = User.objects.create_user(username, email, password, first_name=firstname, last_name=lastname)
-            newUser.save()
             Asset(user=newUser, category="C").save()
             Asset(user=newUser, category="E").save()
             Asset(user=newUser, category="R").save()
