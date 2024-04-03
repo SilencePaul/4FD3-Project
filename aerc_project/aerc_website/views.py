@@ -312,7 +312,7 @@ def vehicle(request):
             context['page'] = page
             context['data'] = data
             context['hasPrev'] = page > 1
-            context['hasNext'] = page * size + len(data) != total
+            context['hasNext'] = (page * size) < total
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'vehicle/index.html', context)
@@ -418,7 +418,7 @@ def house(request):
             context['page'] = page
             context['data'] = data
             context['hasPrev'] = page > 1
-            context['hasNext'] = page * size + len(data) != total
+            context['hasNext'] = (page * size) < total
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'house/index.html', context)
@@ -1130,7 +1130,7 @@ def user(request):
         context['page'] = page
         context['data'] = data
         context['hasPrev'] = page > 1
-        context['hasNext'] = page * size + len(data) != total
+        context['hasNext'] = (page * size) < total
         context['pagePrev'] = page - 1
         context['pageNext'] = page + 1
         return render(request, 'user/index.html', context)
@@ -1156,7 +1156,7 @@ def asset(request):
         context['page'] = page
         context['data'] = data
         context['hasPrev'] = page > 1
-        context['hasNext'] = page * size + len(data) != total
+        context['hasNext'] = (page * size) < total
         context['pagePrev'] = page - 1
         context['pageNext'] = page + 1
         return render(request, 'asset/index.html', context)
