@@ -31,11 +31,31 @@
     </h2>
     <p class="subtitle is-4">View asset report</p>
     <div class="container">
-      <div class="notification is-primary">
+      {% if risk >= 9 %}
+      <div class="notification is-success">
         <p class="subtitle is-5">
           Risk Rating: {{ risk|floatformat:2 }} ({{ level }})
         </p>
       </div>
+      {% elif risk >= 6 %}
+      <div class="notification is-primary">
+        <p class="subtitle is-5">
+          Risk Rating: {{ risk|floatformat:2 }} ({{ level }})
+        </p>
+        </div>
+      {% elif risk >= 3 %}
+      <div class="notification is-warning">
+        <p class="subtitle is-5">
+          Risk Rating: {{ risk|floatformat:2 }} ({{ level }})
+        </p>
+      </div>
+      {% else %}
+      <div class="notification is-danger">
+        <p class="subtitle is-5">
+          Risk Rating: {{ risk|floatformat:2 }} ({{ level }})
+        </p>
+      </div>
+      {% endif %}
     </div>
     <div class="table-container">
       <table class="table is-striped is-hoverable is-fullwidth">

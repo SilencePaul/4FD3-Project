@@ -22,6 +22,7 @@
             type="text"
             value="{{data.street_number}}"
           />
+          {% if errors.street_number %}<p class="help is-danger">{{ errors.street_number }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -34,6 +35,7 @@
             type="text"
             value="{{data.address}}"
           />
+          {% if errors.address %}<p class="help is-danger">{{ errors.address }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -46,6 +48,7 @@
             type="text"
             value="{{data.postal_code}}"
           />
+          {% if errors.postal_code %}<p class="help is-danger">{{ errors.postal_code }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -78,6 +81,7 @@
             type="number"
             value="{{data.lot_width}}"
           />
+          {% if errors.lot_width %}<p class="help is-danger">{{ errors.lot_width }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -90,6 +94,7 @@
             type="number"
             value="{{data.lot_depth}}"
           />
+          {% if errors.lot_depth %}<p class="help is-danger">{{ errors.lot_depth }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -102,6 +107,7 @@
             type="number"
             value="{{data.bedroom}}"
           />
+          {% if errors.bedroom %}<p class="help is-danger">{{ errors.bedroom }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -114,6 +120,7 @@
             type="number"
             value="{{data.bathroom}}"
           />
+          {% if errors.bathroom %}<p class="help is-danger">{{ errors.bathroom }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -126,6 +133,7 @@
             type="number"
             value="{{data.parking}}"
           />
+          {% if errors.parking %}<p class="help is-danger">{{ errors.parking }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -138,6 +146,7 @@
             type="text"
             value="{{data.purchase_price}}"
           />
+          {% if errors.purchase_price %}<p class="help is-danger">{{ errors.purchase_price }}</p>{% endif %}
         </div>
       </div>
       <div class="field">
@@ -150,6 +159,7 @@
             type="date"
             value="{{data.purchase_date|date:'Y-m-d'}}"
           />
+          {% if errors.purchase_date %}<p class="help is-danger">{{ errors.purchase_date }}</p>{% endif %}
         </div>
       </div>
       <div class="field is-grouped">
