@@ -18,6 +18,7 @@
                     <div class="control">
                         <input class="input" name="brand" placeholder="Brand of your vehicle" type="text"
                                value="{{data.brand}}">
+                        {% if errors.brand %} <p class="help is-danger">{{ errors.brand }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field">
@@ -25,6 +26,7 @@
                     <div class="control">
                         <input class="input" name="model" placeholder="Model of your vehicle" type="text"
                                value="{{data.model}}">
+                        {% if errors.model %} <p class="help is-danger">{{ errors.model }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field">
@@ -32,6 +34,7 @@
                     <div class="control">
                         <input class="input" name="year" placeholder="Year that your vehicle was made" type="text"
                                value="{{data.year}}">
+                        {% if errors.year %} <p class="help is-danger">{{ errors.year }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field">
@@ -39,6 +42,7 @@
                     <div class="control">
                         <input class="input" name="color" placeholder="Color of your vehicle" type="text"
                                value="{{data.color}}">
+                        {% if errors.color %} <p class="help is-danger">{{ errors.color }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field">
@@ -46,6 +50,7 @@
                     <div class="control">
                         <input class="input" name="VIN" placeholder="VIN of your vehicle" type="text"
                                value="{{data.VIN}}">
+                        {% if errors.VIN %} <p class="help is-danger">{{ errors.VIN }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field">
@@ -53,6 +58,7 @@
                     <div class="control">
                         <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
                                value="{{data.purchase_price}}">
+                        {% if errors.purchase_price %} <p class="help is-danger">{{ errors.purchase_price }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field">
@@ -60,6 +66,7 @@
                     <div class="control">
                         <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
                                value="{{data.purchase_date|date:'Y-m-d'}}">
+                        {% if errors.purchase_date %} <p class="help is-danger">{{ errors.purchase_date }}</p> {% endif %}
                     </div>
                 </div>
                 <div class="field is-grouped">

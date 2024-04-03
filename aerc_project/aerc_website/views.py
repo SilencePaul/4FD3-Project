@@ -292,6 +292,7 @@ def vehicle(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    errors = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -331,18 +332,59 @@ def vehicle(request):
             VIN = request.POST.get('VIN', "")
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
-            a = Vehicle(
-                asset_id=asset.id,
-                brand=brand,
-                model=model,
-                year=year,
-                color=color,
-                VIN=VIN,
-                purchase_price=purchase_price,
-                purchase_date=purchase_date)
-            if id > 0:
-                a.id = id
-            a.save()
+            try:
+                year = int(year)
+            except:
+                errors['year'] = "Year must be an integer!"
+            if not brand:
+                errors['brand'] = "Brand is required!"
+            if not model:
+                errors['model'] = "Model is required!"
+            if not color:
+                errors['color'] = "Color is required!"
+            if not VIN:
+                errors['VIN'] = "VIN is required!"
+            try:
+                if purchase_price:
+                    purchase_price = float(purchase_price)
+                else:
+                    errors['purchase_price'] = "Purchase Price is required!"
+            except:
+                errors['purchase_price'] = "Purchase Price must be a number!"
+            if not purchase_date:
+                errors['purchase_date'] = "Purchase Date is required!"
+            else:
+                try:
+                    purchase_date = datetime.strptime(purchase_date, "%Y-%m-%d").date()
+                    if purchase_date > datetime.now().date():
+                        errors['purchase_date'] = "Purchase Date must be in the past!"
+                except:
+                    errors['purchase_date'] = "Purchase Date must be in format YYYY-MM-DD!"
+            if errors:
+                context['errors'] = errors
+                context['data'] = {
+                    'brand': brand,
+                    'model': model,
+                    'year': year,
+                    'color': color,
+                    'VIN': VIN,
+                    'purchase_price': purchase_price,
+                    'purchase_date': purchase_date
+                }
+                return render(request, 'vehicle/detail.html', context)
+            else:
+                a = Vehicle(
+                    asset_id=asset.id,
+                    brand=brand,
+                    model=model,
+                    year=year,
+                    color=color,
+                    VIN=VIN,
+                    purchase_price=purchase_price,
+                    purchase_date=purchase_date)
+                if id > 0:
+                    a.id = id
+                a.save()
         # update asset
         targets = Vehicle.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price for x in targets])
@@ -356,6 +398,7 @@ def house(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    errors = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
     if request.method == "GET":
         viewtype = request.GET.get('vt', 'list')
@@ -421,13 +464,91 @@ def house(request):
             location = request.POST.get('location', "")
             street_number = request.POST.get('street_number', "")
             postal_code = request.POST.get('postal_code', "")
-            lot_width = float(request.POST.get('lot_width', 0))
-            lot_depth = float(request.POST.get('lot_depth', 0))
-            bedroom = int(request.POST.get('bedroom', 0))
-            bathroom = int(request.POST.get('bathroom', 0))
-            parking = int(request.POST.get('parking', 0))
+            lot_width = request.POST.get('lot_width', 0)
+            lot_depth = request.POST.get('lot_depth', 0)
+            bedroom = request.POST.get('bedroom', 0)
+            bathroom = request.POST.get('bathroom', 0)
+            parking = request.POST.get('parking', 0)
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
+            if not property_type:
+                errors['property_type'] = "Property Type is required!"
+            if not address:
+                errors['address'] = "Address is required!"
+            if not location:
+                errors['location'] = "Location is required!"
+            if not street_number:
+                errors['street_number'] = "Street Number is required!"
+            if not postal_code:
+                errors['postal_code'] = "Postal Code is required!"
+            try:
+                if lot_width:
+                    lot_width = float(lot_width)
+                else:
+                    errors['lot_width'] = "Lot Width is required!"
+            except:
+                errors['lot_width'] = "Lot Width must be a number!"
+            try:
+                if lot_depth:
+                    lot_depth = float(lot_depth)
+                else:
+                    errors['lot_depth'] = "Lot Depth is required!"
+            except:
+                errors['lot_depth'] = "Lot Depth must be a number!"
+            try:
+                if bedroom:
+                    bedroom = int(bedroom)
+                else:
+                    errors['bedroom'] = "Bedroom is required!"
+            except:
+                errors['bedroom'] = "Bedroom must be an integer!"
+            try:
+                if bathroom:
+                    bathroom = int(bathroom)
+                else:
+                    errors['bathroom'] = "Bathroom is required!"
+            except:
+                errors['bathroom'] = "Bathroom must be an integer!"
+            try:
+                if parking:
+                    parking = int(parking)
+                else:
+                    errors['parking'] = "Parking is required!"
+            except:
+                errors['parking'] = "Parking must be an integer!"
+            try:
+                if purchase_price:
+                    purchase_price = float(purchase_price)
+                else:
+                    errors['purchase_price'] = "Purchase Price is required!"
+            except:
+                errors['purchase_price'] = "Purchase Price must be a number!"
+            if not purchase_date:
+                errors['purchase_date'] = "Purchase Date is required!"
+            else:
+                try:
+                    purchase_date = datetime.strptime(purchase_date, "%Y-%m-%d").date()
+                    if purchase_date > datetime.now().date():
+                        errors['purchase_date'] = "Purchase Date must be in the past!"
+                except:
+                    errors['purchase_date'] = "Purchase Date must be in format YYYY-MM-DD!"
+            if errors:
+                context['errors'] = errors
+                context['locations'] = LocationCategory.CHOICES
+                context['proporty_types'] = PropertyType.CHOICES
+                context['data'] = {
+                    'address': address,
+                    'street_number': street_number,
+                    'postal_code': postal_code,
+                    'lot_width': lot_width,
+                    'lot_depth': lot_depth,
+                    'bedroom': bedroom,
+                    'bathroom': bathroom,
+                    'parking': parking,
+                    'purchase_price': purchase_price,
+                    'purchase_date': purchase_date
+                }
+                return render(request, 'house/edit.html', context)
             a = House(
                 asset_id=asset.id,
                 property_type=property_type,
@@ -459,6 +580,7 @@ def stock(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    errors = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
     ticker = request.GET.get('ticker', None)
     apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
@@ -612,12 +734,44 @@ def stock(request):
             stock.update_on_transaction(transaction)
             stock.save()
         else:
-            share = int(request.POST.get('share', 0))
+            share = request.POST.get('share', 0)
             ticker_symbol = request.POST.get('ticker_symbol', "")
             market = request.POST.get('market', "")
             currency = request.POST.get('currency', "")
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
+            try:
+                share = int(share)
+            except:
+                errors['share'] = "Share must be an integer!"
+            try:
+                if purchase_price:
+                    purchase_price = float(purchase_price)
+                else:
+                    errors['purchase_price'] = "Purchase Price is required!"
+            except:
+                errors['purchase_price'] = "Purchase Price must be a number!"
+            if not purchase_date:
+                errors['purchase_date'] = "Purchase Date is required!"
+            else:
+                try:
+                    purchase_date = datetime.strptime(purchase_date, "%Y-%m-%d").date()
+                    if purchase_date > datetime.now().date():
+                        errors['purchase_date'] = "Purchase Date must be in the past!"
+                except:
+                    errors['purchase_date'] = "Purchase Date must be in format YYYY-MM-DD!"
+            if errors:
+                context['errors'] = errors
+                context['data'] = {
+                    'share': share,
+                    'ticker_symbol': ticker_symbol,
+                    'market': market,
+                    'currency': currency,
+                    'purchase_price': purchase_price,
+                    'purchase_date': purchase_date
+                }
+                return render(request, 'stock/add.html', context)
+
             # user ticker_symbol+market unique check
             if Stock.objects.filter(asset__user=user, ticker_symbol=ticker_symbol, market=market).count() == 0:
                 stock = Stock(
@@ -693,6 +847,7 @@ def crypto(request):
     if cache.get(uid, False) is not True:
         return redirect('login')
     context = {}
+    errors = {}
     context['isAdmin'] = uid == str(ADMIN_ID)
     ticker = request.GET.get('ticker', None)
     apikey = "wW55pKJzExsThjPDizKdf8OAdDfkvLPW"
@@ -843,27 +998,60 @@ def crypto(request):
             crypto.update_on_transaction(transaction)
             crypto.save()
         else:
-            share = int(request.POST.get('share', 0))
+            share = request.POST.get('share', 0)
             ticker_symbol = request.POST.get('ticker_symbol', "")
             name = request.POST.get('name', "")
             currency = request.POST.get('currency', "")
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
-            crypto = Crypto(
-                asset_id=asset.id,
-                share=share,
-                ticker_symbol=ticker_symbol,
-                name=name,
-                currency=currency,
-                purchase_price=purchase_price,
-                purchase_date=purchase_date)
-            crypto.save()
-            initial_transaction = CryptoTransaction(
-                crypto=crypto,
-                share=share,
-                purchase_price=purchase_price,
-                purchase_date=purchase_date)
-            initial_transaction.save()
+            try:
+                share = int(share)
+            except:
+                errors['share'] = "Share must be an integer!"
+            try:
+                if purchase_price:
+                    purchase_price = float(purchase_price)
+                else:
+                    errors['purchase_price'] = "Purchase Price is required!"
+            except:
+                errors['purchase_price'] = "Purchase Price must be a number!"
+            if not purchase_date:
+                errors['purchase_date'] = "Purchase Date is required!"
+            else:
+                try:
+                    purchase_date = datetime.strptime(purchase_date, "%Y-%m-%d").date()
+                    if purchase_date > datetime.now().date():
+                        errors['purchase_date'] = "Purchase Date must be in the past!"
+                except:
+                    errors['purchase_date'] = "Purchase Date must be in format YYYY-MM-DD!"
+            if errors:
+                context['errors'] = errors
+                context['data'] = {
+                    'share': share,
+                    'ticker_symbol': ticker_symbol,
+                    'name': name,
+                    'currency': currency,
+                    'purchase_price': purchase_price,
+                    'purchase_date': purchase_date
+                }
+                return render(request, 'crypto/add.html', context)
+            # user ticker_symbol unique check
+            if Crypto.objects.filter(asset__user=user, ticker_symbol=ticker_symbol).count() == 0:
+                crypto = Crypto(
+                    asset_id=asset.id,
+                    share=share,
+                    ticker_symbol=ticker_symbol,
+                    name=name,
+                    currency=currency,
+                    purchase_price=purchase_price,
+                    purchase_date=purchase_date)
+                crypto.save()
+                initial_transaction = CryptoTransaction(
+                    crypto=crypto,
+                    share=share,
+                    purchase_price=purchase_price,
+                    purchase_date=purchase_date)
+                initial_transaction.save()
         # update asset
         targets = Crypto.objects.filter(asset__user__id=uid).all()
         asset.purchase_price = sum([x.purchase_price * x.share for x in targets])
