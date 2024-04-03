@@ -87,17 +87,23 @@ def report(request):
         else:
             weighted_risk += a.purchase_price * 4
         total_value += a.purchase_price
-    score = weighted_risk/total_value
-    context['risk'] = weighted_risk/total_value
+        
+    if total_value != 0:
+        score = weighted_risk/total_value
+    else:
+        score = 0
 
+    context['risk'] = score
     if score >= 9:
         context['level'] = "Low"
     elif score >= 6:
         context['level'] = "Moderate"
     elif score >= 3:
         context['level'] = "High"
-    else:
+    elif score >0:
         context['level'] = "Extreme"
+    else:
+        context['level'] = "Unknown"
 
     return render(request, 'report.html', context)
 
