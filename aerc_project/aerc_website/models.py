@@ -305,7 +305,7 @@ class Crypto(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
     ticker_symbol = models.CharField(max_length=20, default="", db_index=True)
     name = models.CharField(max_length=256, default="")
-    share = models.PositiveIntegerField(default=0)
+    share = models.FloatField(default=0)
     currency = models.CharField(max_length=3, default="")
     purchase_price = models.FloatField(default=0)
     purchase_date = models.DateField()
@@ -360,7 +360,7 @@ def decrypt_crypto(sender, instance, **kwargs):
 
 class CryptoTransaction(models.Model):
     crypto = models.ForeignKey(Crypto, on_delete=models.CASCADE)
-    share = models.IntegerField(default=0)
+    share = models.FloatField(default=0)
     purchase_date = models.DateField(null=True)
     purchase_price = models.FloatField(default=0)
 

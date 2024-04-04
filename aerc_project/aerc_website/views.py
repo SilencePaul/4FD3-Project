@@ -44,6 +44,9 @@ def report(request):
     matplotlib.use('Agg')
 
     assets = Asset.objects.filter(user__id=uid).all()
+    total_value = 0
+    asset_labels = []
+    asset_values = []
     for a in assets:
         for c in AssetType.CHOICES:
             if c[0] == str(a.category):
@@ -71,6 +74,41 @@ def report(request):
         img.seek(0)
         plot_url = base64.b64encode(img.getvalue()).decode()
         context['plot_urls'].append(f'data:image/png;base64,{plot_url}')
+
+        # Prepare data for pie chart
+        if day_values:  # Check if there are any day_values
+            latest_value = day_values[-1]
+            total_value += latest_value
+            asset_labels.append(str(a))
+            asset_values.append(latest_value)
+
+    # Pie chart for asset distribution
+    if total_value > 0:  # Ensure there is at least some value to display
+        asset_proportions = [value / total_value for value in asset_values]
+
+        # Adjust figure size to give more room for the legend
+        plt.figure(figsize=(12, 8))  # Adjust the figure size as needed
+        fig1, ax1 = plt.subplots()
+
+        # Generate the pie chart with percentages displayed on the slices
+        wedges, texts, autotexts = ax1.pie(asset_proportions, startangle=90, shadow=True, autopct='%1.1f%%', colors=plt.cm.tab20.colors)
+
+        # Customize autopct font size and color for better readability
+        plt.setp(autotexts, size='x-small', color='white', weight='bold')
+
+        # Customize legend
+        ax1.legend(wedges, asset_labels, title="Assets", loc="center left", bbox_to_anchor=(1, 0.5),
+                fontsize='small', title_fontsize='medium')
+
+        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        plt.tight_layout()
+
+        # Save the figure
+        img = io.BytesIO()
+        plt.savefig(img, format='png', bbox_inches='tight')
+        img.seek(0)
+        pie_chart_url = base64.b64encode(img.getvalue()).decode()
+        context['pie_chart_url'] = f'data:image/png;base64,{pie_chart_url}'
 
     context['assets'] = assets
 
@@ -327,7 +365,7 @@ def vehicle(request):
             context['id'] = id
             if id > 0:
                 context['data'] = Vehicle.objects.get(id=id)
-            return render(request, 'vehicle/add.html', context)
+            return render(request, 'vehicle/edit.html', context)
         elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
             id = int(request.GET.get('id', 0))
             context['id'] = id
@@ -350,7 +388,7 @@ def vehicle(request):
 
                     # Determine which depreciation rate to use based on the manufacturing year, purchase year, and current year
                     if vehicle_data.purchase_date.year == vehicle_data.year:
-                        if current_year - vehicle_data.year < 5:    # first 5 years depreciated more
+                        if current_year - vehicle_data.year < 5:  # first 5 years depreciated more
                             depreciation_rate = 0.0152  # 1.52% compounded monthly, drops 48% in first 4 years and 60% in first 5 years
                         else:
                             depreciation_rate = 0.0085  # later years using 0.85% depreciation rate compounded monthly
@@ -359,7 +397,7 @@ def vehicle(request):
                             depreciation_rate = 0.0152
                         else:
                             depreciation_rate = 0.0085
-                    else:   # purchase year is beyond the first 5 years of manufacturing
+                    else:  # purchase year is beyond the first 5 years of manufacturing
                         depreciation_rate = 0.0041  # only uses 0.0041 for the depreciation if the purchase year is beyond the manufacturing year + 5 years
 
                     # Calculate the depreciated value for this month
@@ -382,11 +420,14 @@ def vehicle(request):
                 plt.xticks(rotation=45)
                 plt.tight_layout()
                 ax.legend()
+
+                # Save the plot to a bytes buffer
                 img = io.BytesIO()
                 plt.savefig(img, format='png')
                 img.seek(0)
                 plot_url = base64.b64encode(img.getvalue()).decode()
                 context['plot_url'] = f'data:image/png;base64,{plot_url}'
+
             return render(request, 'vehicle/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
@@ -1076,9 +1117,9 @@ def crypto(request):
             purchase_price = request.POST.get('purchase_price', "")
             purchase_date = request.POST.get('purchase_date', "")
             try:
-                share = int(share)
+                share = float(share)
             except:
-                errors['share'] = "Share must be an integer!"
+                errors['share'] = "Share must be a number!"
             try:
                 if purchase_price:
                     purchase_price = float(purchase_price)
@@ -1155,7 +1196,6 @@ def crypto_search(request, crypto_ticker):
         }
         response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
         response_json = response.json()
-        print(response_json)
         response_json_results = response_json["results"]
         result_count = len(response_json_results)
         result_list = []
@@ -1170,7 +1210,6 @@ def crypto_search(request, crypto_ticker):
             }
             response = requests.get("https://api.polygon.io/v3/reference/tickers", params=params)
             response_json = response.json()
-            print(response_json)
             response_json_results = response_json["results"]
             for result in response_json_results:
                 result_list.append(result)
