@@ -1098,9 +1098,9 @@ def crypto(request):
             purchase_date = request.POST.get('purchase_date', "")
             crypto = Crypto.objects.get(id=id)
             if buy_or_sell == "sell":
-                share = -int(request.POST.get('share', 0))
+                share = -float(request.POST.get('share', 0))
             else:
-                share = int(request.POST.get('share', 0))
+                share = float(request.POST.get('share', 0))
             transaction = CryptoTransaction(
                 crypto=crypto,
                 share=share,

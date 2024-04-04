@@ -12,7 +12,7 @@
             <div class="field">
                 <label class="label">Share</label>
                 <div class="control">
-                    <input class="input" name="share" placeholder="Share of your crypto" type="number"
+                    <input class="input" name="share" placeholder="Share of your crypto" type="number" step="any"
                             value="{{data.share}}" step="any">
                     {% if errors.share %}<p class="help is-danger">{{ errors.share }}</p>{% endif %}
                 </div>
@@ -56,7 +56,7 @@
             <div class="field">
                 <label class="label">Purchase Price</label>
                 <div class="control">
-                    <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
+                    <input class="input" name="purchase_price" placeholder="Purchase Price" type="number" step="0.01"
                             value="{{data.purchase_price}}">
                     {% if errors.purchase_price %}<p class="help is-danger">{{ errors.purchase_price }}</p>{% endif %}
                 </div>
