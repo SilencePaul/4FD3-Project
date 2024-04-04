@@ -354,11 +354,57 @@ def vehicle(request):
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'vehicle/index.html', context)
-        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+        elif VIEWTYPE[viewtype] is VIEWTYPE.edit:
             id = int(request.GET.get('id', 0))
             context['id'] = id
             if id > 0:
                 context['data'] = Vehicle.objects.get(id=id)
+            return render(request, 'vehicle/edit.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                vehicle_data = Vehicle.objects.get(id=id)
+                context['data'] = vehicle_data
+                # Generate the Plot for html
+                depreciation_rate = 0.01  # 1% per month
+
+                # Calculate depreciation from purchase_date to now (or any end date you wish)
+                purchase_date = vehicle_data.purchase_date
+                current_date = datetime.now()
+                months_passed = (current_date.year - purchase_date.year) * 12 + current_date.month - purchase_date.month
+
+                months = []
+                prices = []
+                current_price = vehicle_data.purchase_price
+                
+                for month in range(months_passed + 1):
+                    months.append(purchase_date + timedelta(days=30*month))  # Approximation
+                    prices.append(current_price)
+                    current_price *= (1 - depreciation_rate)  # Apply depreciation
+                
+                context['total_return'] = current_price - vehicle_data.purchase_price
+                # Setup matplotlib to use a non-interactive backend
+                matplotlib.use('Agg')
+
+                # Plotting the depreciation over time
+                fig, ax = plt.subplots()
+                ax.plot(months, prices, label='Estimated Value Over Time')
+                ax.axhline(y=vehicle_data.purchase_price, color='r', linestyle='--', label='Purchase Price')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Price ($)')
+                ax.set_title(f'{vehicle_data} Vehicle Price Over Time')
+                plt.xticks(rotation=45)
+                plt.tight_layout()
+                ax.legend()
+
+                # Save the plot to a bytes buffer
+                img = io.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                plot_url = base64.b64encode(img.getvalue()).decode()
+                context['plot_url'] = f'data:image/png;base64,{plot_url}'
+
             return render(request, 'vehicle/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))

@@ -1,83 +1,61 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
 {% block content %}
-    <section class="section">
+<section class="section">
+    <div class="container">
+        <h2 class="title is-2">Vehicle Management</h2>
+        <p class="subtitle is-4">
+            {{ data }}
+        </p>
         <div class="container">
-            <h2 class="title is-2">Vehicle Management</h2>
-            <p class="subtitle is-4">
-                {% if id > 0 %}
-                Edit your vehicle
-                {% else %}
-                Add your new vehicle
-                {% endif %}
-            </p>
-            <form action="vehicle" method="post">
-                {% csrf_token %}
-                <input name="id" type="hidden" value="{% if data.id > 0 %}{{ data.id }}{% else %}0{% endif %}">
-                <div class="field">
-                    <label class="label">Brand</label>
-                    <div class="control">
-                        <input class="input" name="brand" placeholder="Brand of your vehicle" type="text"
-                               value="{{data.brand}}">
-                        {% if errors.brand %} <p class="help is-danger">{{ errors.brand }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Model</label>
-                    <div class="control">
-                        <input class="input" name="model" placeholder="Model of your vehicle" type="text"
-                               value="{{data.model}}">
-                        {% if errors.model %} <p class="help is-danger">{{ errors.model }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Year</label>
-                    <div class="control">
-                        <input class="input" name="year" placeholder="Year that your vehicle was made" type="text"
-                               value="{{data.year}}">
-                        {% if errors.year %} <p class="help is-danger">{{ errors.year }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Color</label>
-                    <div class="control">
-                        <input class="input" name="color" placeholder="Color of your vehicle" type="text"
-                               value="{{data.color}}">
-                        {% if errors.color %} <p class="help is-danger">{{ errors.color }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">VIN</label>
-                    <div class="control">
-                        <input class="input" name="VIN" placeholder="VIN of your vehicle" type="text"
-                               value="{{data.VIN}}">
-                        {% if errors.VIN %} <p class="help is-danger">{{ errors.VIN }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Purchase Price</label>
-                    <div class="control">
-                        <input class="input" name="purchase_price" placeholder="Purchase Price" type="text"
-                               value="{{data.purchase_price}}">
-                        {% if errors.purchase_price %} <p class="help is-danger">{{ errors.purchase_price }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Purchase Date</label>
-                    <div class="control">
-                        <input class="input" name="purchase_date" placeholder="Purchase Date" type="date"
-                               value="{{data.purchase_date|date:'Y-m-d'}}">
-                        {% if errors.purchase_date %} <p class="help is-danger">{{ errors.purchase_date }}</p> {% endif %}
-                    </div>
-                </div>
-                <div class="field is-grouped">
-                    <div class="control">
-                        <input class="button is-link" type="submit" value="Save"/>
-                    </div>
-                    <div class="control">
-                        <a class="button is-link is-light" href="?vt=list">Cancel</a>
-                    </div>
-                </div>
-            </form>
+            <table class="table is-striped is-hoverable is-fullwidth">
+                <table class="table is-striped is-hoverable is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <td>Make</td>
+                            <td>{{ data.make }}</td>
+                        </tr>
+                        <tr>
+                            <td>Model</td>
+                            <td>{{ data.model }}</td>
+                        </tr>
+                        <tr>
+                            <td>Year</td>
+                            <td>{{ data.year }}</td>
+                        </tr>
+                        <tr>
+                            <td>Color</td>
+                            <td>{{ data.color }}</td>
+                        </tr>
+                        <tr>
+                            <td>License Plate</td>
+                            <td>{{ data.license_plate }}</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Price</td>
+                            <td>{{ data.purchase_price }}</td>
+                        </tr>
+                        <tr>
+                            <td>Purchase Date</td>
+                            <td>{{ data.purchase_date|date:'Y-m-d' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Return</td>
+                            {% if total_return > 0 %}
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return | floatformat }}</td>
+                            {% else %}
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return | floatformat }}</td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </table>
         </div>
-    </section>
+        <div class="stock-info-graph">
+            <div class="container">
+                <div class="columns is-vcentered is-centered">
+                    <div class="column is-half">
+                        <figure class="image">
+                            <img src={{plot_url}} alt="Graph Image">
+                        </figure>
+                    </div>
 {% endblock %}
