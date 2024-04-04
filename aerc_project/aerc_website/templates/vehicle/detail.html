@@ -1,18 +1,18 @@
-{% extends "base.html" %} 
+{% extends "base.html" %}
 {% block content %}
-<section class="section">
-    <div class="container">
-        <h2 class="title is-2">Vehicle Management</h2>
-        <p class="subtitle is-4">
-            {{ data }}
-        </p>
+    <section class="section">
         <div class="container">
+            <h2 class="title is-2">Vehicle Management</h2>
+            <p class="subtitle is-4">
+                {{ data }}
+            </p>
+            <div class="container">
             <table class="table is-striped is-hoverable is-fullwidth">
                 <table class="table is-striped is-hoverable is-fullwidth">
                     <tbody>
                         <tr>
-                            <td>Make</td>
-                            <td>{{ data.make }}</td>
+                            <td>Brand</td>
+                            <td>{{ data.brand }}</td>
                         </tr>
                         <tr>
                             <td>Model</td>
@@ -27,24 +27,32 @@
                             <td>{{ data.color }}</td>
                         </tr>
                         <tr>
-                            <td>License Plate</td>
-                            <td>{{ data.license_plate }}</td>
+                            <td>Vehicle Identification Number</td>
+                            <td>{{ data.VIN }}</td>
                         </tr>
                         <tr>
                             <td>Purchase Price</td>
-                            <td>{{ data.purchase_price }}</td>
+                            <td>${{ data.purchase_price }}</td>
                         </tr>
                         <tr>
                             <td>Purchase Date</td>
                             <td>{{ data.purchase_date|date:'Y-m-d' }}</td>
                         </tr>
+                         <tr>
+                            <td>Current Price (estimated)</td>
+                            <td>${{ current_price }}</td>
+                        </tr>
                         <tr>
                             <td>Total Return</td>
                             {% if total_return > 0 %}
-                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>{{ total_return | floatformat }}</td>
+                            <td class="has-text-success"><span><i class="fa-solid fa-arrow-up"></i></span>${{ total_return | floatformat }}</td>
                             {% else %}
-                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>{{ total_return | floatformat }}</td>
+                            <td class="has-text-danger"><span><i class="fa-solid fa-arrow-down"></i></span>${{ total_return | floatformat }}</td>
                             {% endif %}
+                        </tr>
+                        <tr>
+                            <td>Annual Return(avg.)</td>
+                            <td>{{ annual_return }}%</td>
                         </tr>
                     </tbody>
                 </table>
@@ -58,4 +66,9 @@
                             <img src={{plot_url}} alt="Graph Image">
                         </figure>
                     </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
 {% endblock %}
