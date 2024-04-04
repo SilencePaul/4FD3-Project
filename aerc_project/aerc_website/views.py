@@ -316,11 +316,77 @@ def vehicle(request):
             context['pagePrev'] = page - 1
             context['pageNext'] = page + 1
             return render(request, 'vehicle/index.html', context)
-        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+        elif VIEWTYPE[viewtype] is VIEWTYPE.add:
             id = int(request.GET.get('id', 0))
             context['id'] = id
             if id > 0:
                 context['data'] = Vehicle.objects.get(id=id)
+            return render(request, 'vehicle/add.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.edit:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                context['data'] = Vehicle.objects.get(id=id)
+            return render(request, 'vehicle/add.html', context)
+        elif VIEWTYPE[viewtype] is VIEWTYPE.detail:
+            id = int(request.GET.get('id', 0))
+            context['id'] = id
+            if id > 0:
+                vehicle_data = Vehicle.objects.get(id=id)
+                context['data'] = Vehicle.objects.get(id=id)
+                # Calculating the depreciated prices and owned months
+                current_date = datetime.now()
+                months_difference = (
+                                            current_date.year - vehicle_data.purchase_date.year) * 12 + current_date.month - vehicle_data.purchase_date.month
+                # below code adjust for days within the month (i.e. if partial month has elapsed)
+                if current_date.day < vehicle_data.purchase_date.day:
+                    months_difference -= 1
+                owned_months = [vehicle_data.purchase_date + timedelta(days=30 * i) for i in
+                                range(months_difference)]
+                depreciated_prices = [vehicle_data.purchase_price]  # init the first price in the list
+                for month in range(1, months_difference):
+                    # Calculate the year for the current month
+                    current_year = vehicle_data.purchase_date.year + int(month / 12)
+
+                    # Determine which depreciation rate to use based on the manufacturing year, purchase year, and current year
+                    if vehicle_data.purchase_date.year == vehicle_data.year:
+                        if current_year - vehicle_data.year < 5:    # first 5 years depreciated more
+                            depreciation_rate = 0.0152  # 1.52% compounded monthly, drops 48% in first 4 years and 60% in first 5 years
+                        else:
+                            depreciation_rate = 0.0085  # later years using 0.85% depreciation rate compounded monthly
+                    elif vehicle_data.purchase_date.year > vehicle_data.year and current_year - vehicle_data.year <= 5:
+                        if current_year - vehicle_data.year < 5:
+                            depreciation_rate = 0.0152
+                        else:
+                            depreciation_rate = 0.0085
+                    else:   # purchase year is beyond the first 5 years of manufacturing
+                        depreciation_rate = 0.0041  # only uses 0.0041 for the depreciation if the purchase year is beyond the manufacturing year + 5 years
+
+                    # Calculate the depreciated value for this month
+                    depreciated_value = depreciated_prices[-1] * (1 - depreciation_rate)
+                    depreciated_prices.append(depreciated_value)
+
+                context['current_price'] = round(depreciated_prices[-1], 2)
+                context['total_return'] = depreciated_prices[-1] - vehicle_data.purchase_price
+                context['annual_return'] = round(
+                    (depreciated_prices[-1] - vehicle_data.purchase_price) / vehicle_data.purchase_price / (
+                            months_difference / 12) * 100, 2)
+                # Generate the Plot for html
+                matplotlib.use('Agg')
+                fig, ax = plt.subplots()
+                ax.plot(owned_months, depreciated_prices, label=vehicle_data)
+                ax.axhline(y=vehicle_data.purchase_price, color='r', linestyle='--', label='Purchase Price')
+                ax.set_xlabel('Date')
+                ax.set_ylabel('Price')
+                ax.set_title(f'{vehicle_data} House Price')
+                plt.xticks(rotation=45)
+                plt.tight_layout()
+                ax.legend()
+                img = io.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                plot_url = base64.b64encode(img.getvalue()).decode()
+                context['plot_url'] = f'data:image/png;base64,{plot_url}'
             return render(request, 'vehicle/detail.html', context)
     if request.method == "POST":
         id = int(request.POST.get('id', 0))
